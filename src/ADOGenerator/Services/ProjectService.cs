@@ -90,26 +90,45 @@ namespace ADOGenerator.Services
                 statusMessages = value;
             }
         }
-        public void AddMessage(string id, string message)
-        {
-            lock (objLock)
-            {
-                if (id.EndsWith("_Errors"))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(message);
-                    Console.ResetColor();
-                    StatusMessages[id] = (StatusMessages.ContainsKey(id) ? StatusMessages[id] : string.Empty) + message;
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    StatusMessages[id] = message;
-                    Console.WriteLine(message);
-                    Console.ResetColor();
-                }
-            }
-        }
+        //public void AddMessage(string id, string message)
+        //{
+        //    lock (objLock)
+        //    {
+        //        // Create Log floder
+        //        if (!Directory.Exists("Log"))
+        //        {
+        //            Directory.CreateDirectory("Log");
+        //        }
+        //        string logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Log");
+        //        string fileName = $"{DateTime.Now.ToString("yyyy-MM-dd")}-{id}.txt";
+        //        if (id.EndsWith("_Errors"))
+        //        {
+        //            // Create Log file
+        //            if (!File.Exists(Path.Combine(logFilePath, "Errors", fileName)))
+        //            {
+        //                File.Create(Path.Combine(logFilePath, "Errors", fileName)).Dispose();
+        //            }
+        //            File.AppendAllLines(Path.Combine(logFilePath, "Errors", fileName), new string[] { message });
+        //            Console.ForegroundColor = ConsoleColor.Red;
+        //            Console.WriteLine(message);
+        //            Console.ResetColor();
+        //            StatusMessages[id] = (StatusMessages.ContainsKey(id) ? StatusMessages[id] : string.Empty) + message;
+        //        }
+        //        else
+        //        {
+        //            if (!File.Exists(Path.Combine(logFilePath, fileName)))
+        //            {
+        //                File.Create(Path.Combine(logFilePath, fileName)).Dispose();
+        //            }
+        //            File.AppendAllLines(Path.Combine(logFilePath, fileName), new string[] { message });
+        //            // Create Log file
+        //            Console.ForegroundColor = ConsoleColor.Green;
+        //            StatusMessages[id] = message;
+        //            Console.WriteLine(message);
+        //            Console.ResetColor();
+        //        }
+        //    }
+        //}
         public void RemoveKey(string id)
         {
             lock (objLock)
@@ -338,7 +357,7 @@ namespace ADOGenerator.Services
                             }
                             else
                             {
-                                AddMessage(model.id.ErrorId(), "Could not recognize process template. Make sure that the exported project template is belog to standard process template or project setting file has valid process template id.");
+                                model.id.ErrorId().AddMessage("Could not recognize process template. Make sure that the exported project template is belog to standard process template or project setting file has valid process template id.");
                                 StatusMessages[model.id] = "100";
                                 return new string[] { model.id, accountName, templateUsed };
                             }
@@ -353,8 +372,7 @@ namespace ADOGenerator.Services
                 else
                 {
                     Console.WriteLine("Project Templates not found");
-                    AddMessage(model.id.ErrorId(), "Project Templates not found");
-                    StatusMessages[model.id] = "100";
+                    model.id.ErrorId().AddMessage("Project Templates not found");
                     return new string[] { model.id, accountName, templateUsed };
                 }
             }
@@ -376,15 +394,15 @@ namespace ADOGenerator.Services
                 {
                     if (proj.LastFailureMessage.Contains("TF400813"))
                     {
-                        AddMessage(model.id, "OAUTHACCESSDENIED");
+                        model.id.ErrorId().AddMessage("OAUTHACCESSDENIED");
                     }
                     else if (proj.LastFailureMessage.Contains("TF50309"))
                     {
-                        AddMessage(model.id.ErrorId(), proj.LastFailureMessage);
+                        model.id.ErrorId().AddMessage(proj.LastFailureMessage);
                     }
                     else
                     {
-                        AddMessage(model.id.ErrorId(), proj.LastFailureMessage);
+                        model.id.ErrorId().AddMessage(proj.LastFailureMessage);
                     }
                 }
                 Thread.Sleep(2000); // Adding Delay to Get Error message
@@ -392,7 +410,7 @@ namespace ADOGenerator.Services
             }
             else
             {
-                AddMessage(model.id, string.Format("Project {0} created", model.ProjectName));
+                model.id.AddMessage(string.Format("Project {0} created", model.ProjectName));
             }
             // waiting to add first message
             Thread.Sleep(2000);
@@ -427,7 +445,7 @@ namespace ADOGenerator.Services
             //if (isAdded)
             //{
             //    Console.WriteLine(string.Format("Added user {0} as project admin ", model.Email));
-            //    AddMessage(model.id, string.Format("Added user {0} as project admin ", model.Email));
+            //    model.id.AddMessage( string.Format("Added user {0} as project admin ", model.Email));
             //}
 
             //Install required extensions
@@ -437,7 +455,7 @@ namespace ADOGenerator.Services
                 Thread.Sleep(1000);
                 if (isInstalled)
                 {
-                    AddMessage(model.id, "Required extensions are installed");
+                    model.id.AddMessage("Required extensions are installed");
                 }
 
             }
@@ -550,7 +568,7 @@ namespace ADOGenerator.Services
                                 }
                             }
                             //Enable Epic Backlog
-                            AddMessage(model.id, "Board-Column, Swimlanes, Styles updated");
+                            model.id.AddMessage("Board-Column, Swimlanes, Styles updated");
                         }
                     }
                 }
@@ -689,7 +707,7 @@ namespace ADOGenerator.Services
                                 board.IncludeSubAreas(JsonConvert.SerializeObject(subAreas), _boardVersion, teamRes);
                             }
                         }
-                        AddMessage(model.id, "Board-Column, Swimlanes, Styles updated");
+                        model.id.AddMessage("Board-Column, Swimlanes, Styles updated");
                     }
                     UpdateSprintItems(model, _boardVersion, settings);
 
@@ -921,7 +939,7 @@ namespace ADOGenerator.Services
                 {
                     wiMapping = import.ImportWorkitems(workItems, model.ProjectName, model.Environment.UserUniquename, model.ReadJsonFile(projectSettingsFile), attchmentFilesFolder, string.Empty, model.Environment.ProjectId, model.Environment.pullRequests, model.UserMethod, model.accountUsersForWi, templateUsed);
                 }
-                AddMessage(model.id, "Work Items created");
+                model.id.AddMessage("Work Items created");
             }
             //Creat TestPlans and TestSuites
             List<string> listTestPlansJsonPaths = new List<string>();
@@ -937,7 +955,7 @@ namespace ADOGenerator.Services
             }
             if (listTestPlansJsonPaths.Count > 0)
             {
-                //AddMessage(model.id, "TestPlans, TestSuites and TestCases created");
+                //model.id.AddMessage( "TestPlans, TestSuites and TestCases created");
             }
             // create varibale groups
 
@@ -991,7 +1009,7 @@ namespace ADOGenerator.Services
             bool isBuild = CreateBuildDefinition(model, _buildVersion, model.id);
             if (isBuild)
             {
-                AddMessage(model.id, "Build definition created");
+                model.id.AddMessage("Build definition created");
             }
 
             //Queue a Build
@@ -1013,14 +1031,14 @@ namespace ADOGenerator.Services
             bool isReleased = CreateReleaseDefinition(model, _releaseVersion, model.id, teamMembers);
             if (isReleased)
             {
-                AddMessage(model.id, "Release definition created");
+                model.id.AddMessage("Release definition created");
             }
 
             //Create Branch Policy
             bool isBuildPolicyCreated = CreateBranchPolicy(model, _buildVersion);
             if (isBuildPolicyCreated)
             {
-                AddMessage(model.id, "Branch Policy created");
+                model.id.AddMessage("Branch Policy created");
             }
 
             //Create query and widgets
@@ -1059,7 +1077,7 @@ namespace ADOGenerator.Services
                         }
                     }
                 }
-                AddMessage(model.id, "Queries, Widgets and Charts created");
+                model.id.AddMessage("Queries, Widgets and Charts created");
             }
             return new string[] { model.id, accountName, templateUsed };
         }
@@ -1123,7 +1141,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while creating branch policy : " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while creating branch policy : " + ex.Message);
             }
             return isBranchPolicyCreated;
         }
@@ -1160,11 +1178,11 @@ namespace ADOGenerator.Services
                                     {
                                         model.Environment.GitHubRepos.Add(model.GitRepoName, model.GitRepoURL);
                                     }
-                                    AddMessage(model.id, string.Format("Forked {0} repository to {1} user", model.GitRepoName, _gitHubConfig.userName));
+                                    model.id.AddMessage(string.Format("Forked {0} repository to {1} user", model.GitRepoName, _gitHubConfig.userName));
                                 }
                                 else
                                 {
-                                    AddMessage(model.id.ErrorId(), "Error while forking the repository: " + forkResponse.Content.ReadAsStringAsync().Result);
+                                    model.id.ErrorId().AddMessage("Error while forking the repository: " + forkResponse.Content.ReadAsStringAsync().Result);
                                     // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + "Error while forking the repository: " + forkResponse.Content.ReadAsStringAsync().Result + "\n");
                                 }
                             }
@@ -1175,7 +1193,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while forking repository :" + ex.Message);
+                model.id.ErrorId().AddMessage("Error while forking repository :" + ex.Message);
             }
         }
 
@@ -1259,7 +1277,6 @@ namespace ADOGenerator.Services
                                             // TILL HERE
                                         }
                                     }
-
                                 }
                             }
                             // END
@@ -1301,11 +1318,11 @@ namespace ADOGenerator.Services
                             }
                             if (!(string.IsNullOrEmpty(objTeam.LastFailureMessage)))
                             {
-                                AddMessage(id.ErrorId(), "Error while creating teams: " + objTeam.LastFailureMessage + Environment.NewLine);
+                                id.ErrorId().AddMessage("Error while creating teams: " + objTeam.LastFailureMessage + Environment.NewLine);
                             }
                             else
                             {
-                                AddMessage(id, string.Format("{0} team(s) created", teamsParsed.Count));
+                                id.AddMessage(string.Format("{0} team(s) created", teamsParsed.Count));
                             }
                             if (model.SelectedTemplate.ToLower() == "smarthotel360")
                             {
@@ -1326,7 +1343,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while creating teams: " + ex.Message);
+                id.ErrorId().AddMessage("Error while creating teams: " + ex.Message);
 
             }
         }
@@ -1349,14 +1366,14 @@ namespace ADOGenerator.Services
 
                 if (!(string.IsNullOrEmpty(objTeam.LastFailureMessage)))
                 {
-                    AddMessage(id.ErrorId(), "Error while getting team members: " + objTeam.LastFailureMessage + Environment.NewLine);
+                    id.ErrorId().AddMessage("Error while getting team members: " + objTeam.LastFailureMessage + Environment.NewLine);
                 }
                 return viewModel;
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while getting team members: " + ex.Message);
+                id.ErrorId().AddMessage("Error while getting team members: " + ex.Message);
             }
 
             return new TeamMemberResponse.TeamMembers();
@@ -1381,14 +1398,14 @@ namespace ADOGenerator.Services
                     jsonWorkItems = model.ReadJsonFile(jsonWorkItems);
                     JContainer workItemsParsed = JsonConvert.DeserializeObject<JContainer>(jsonWorkItems);
 
-                    AddMessage(id, "Creating " + workItemsParsed.Count + " work items...");
+                    id.AddMessage( "Creating " + workItemsParsed.Count + " work items...");
 
                     jsonWorkItems = jsonWorkItems.Replace("$version$", _defaultConfiguration.VersionNumber);
                     bool workItemResult = objWorkItem.CreateWorkItemUsingByPassRules(model.ProjectName, jsonWorkItems);
 
                     if (!(string.IsNullOrEmpty(objWorkItem.LastFailureMessage)))
                     {
-                        AddMessage(id.ErrorId(), "Error while creating workitems: " + objWorkItem.LastFailureMessage + Environment.NewLine);
+                       id.ErrorId().AddMessage( "Error while creating workitems: " + objWorkItem.LastFailureMessage + Environment.NewLine);
                     }
                 }
 
@@ -1396,7 +1413,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while creating workitems: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while creating workitems: " + ex.Message);
 
             }
         }
@@ -1423,13 +1440,13 @@ namespace ADOGenerator.Services
                 }
                 else if (!(string.IsNullOrEmpty(objBoard.LastFailureMessage)))
                 {
-                    AddMessage(id.ErrorId(), "Error while updating board column " + objBoard.LastFailureMessage + Environment.NewLine);
+                   id.ErrorId().AddMessage( "Error while updating board column " + objBoard.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while updating board column " + ex.Message);
+               id.ErrorId().AddMessage( "Error while updating board column " + ex.Message);
             }
             return result;
         }
@@ -1451,13 +1468,13 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objCards.LastFailureMessage))
                 {
-                    AddMessage(id.ErrorId(), "Error while updating card fields: " + objCards.LastFailureMessage + Environment.NewLine);
+                   id.ErrorId().AddMessage( "Error while updating card fields: " + objCards.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while updating card fields: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while updating card fields: " + ex.Message);
 
             }
 
@@ -1479,13 +1496,13 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objCards.LastFailureMessage))
                 {
-                    AddMessage(id.ErrorId(), "Error while updating card styles: " + objCards.LastFailureMessage + Environment.NewLine);
+                   id.ErrorId().AddMessage( "Error while updating card styles: " + objCards.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while updating card styles: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while updating card styles: " + ex.Message);
             }
 
         }
@@ -1507,13 +1524,13 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objCards.LastFailureMessage))
                 {
-                    AddMessage(id.ErrorId(), "Error while Setting Epic Settings: " + objCards.LastFailureMessage + Environment.NewLine);
+                   id.ErrorId().AddMessage( "Error while Setting Epic Settings: " + objCards.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while Setting Epic Settings: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while Setting Epic Settings: " + ex.Message);
             }
 
         }
@@ -1544,7 +1561,7 @@ namespace ADOGenerator.Services
                     bool workItemUpdateResult = objWorkItem.UpdateWorkItemUsingByPassRules(jsonWorkItemsUpdate, model.ProjectName, currentUser, jsonProjectSettings);
                     if (!(string.IsNullOrEmpty(objWorkItem.LastFailureMessage)))
                     {
-                        AddMessage(id.ErrorId(), "Error while updating work items: " + objWorkItem.LastFailureMessage + Environment.NewLine);
+                       id.ErrorId().AddMessage( "Error while updating work items: " + objWorkItem.LastFailureMessage + Environment.NewLine);
                     }
                 }
             }
@@ -1552,7 +1569,7 @@ namespace ADOGenerator.Services
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
 
-                AddMessage(id.ErrorId(), "Error while updating work items: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while updating work items: " + ex.Message);
 
             }
         }
@@ -1602,7 +1619,7 @@ namespace ADOGenerator.Services
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
 
-                AddMessage(model.id.ErrorId(), "Error while updating iteration: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while updating iteration: " + ex.Message);
             }
         }
 
@@ -1686,14 +1703,14 @@ namespace ADOGenerator.Services
 
                     if (!(string.IsNullOrEmpty(objClassification.LastFailureMessage)))
                     {
-                        AddMessage(model.id.ErrorId(), "Error while updating sprint items: " + objClassification.LastFailureMessage + Environment.NewLine);
+                        model.id.ErrorId().AddMessage( "Error while updating sprint items: " + objClassification.LastFailureMessage + Environment.NewLine);
                     }
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while updating sprint items: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while updating sprint items: " + ex.Message);
 
             }
         }
@@ -1717,7 +1734,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while renaming iterations: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while renaming iterations: " + ex.Message);
             }
         }
 
@@ -1774,7 +1791,7 @@ namespace ADOGenerator.Services
 
                     if (!(string.IsNullOrEmpty(objRepository.LastFailureMessage)))
                     {
-                        AddMessage(id.ErrorId(), "Error while importing source code: " + objRepository.LastFailureMessage + Environment.NewLine);
+                       id.ErrorId().AddMessage( "Error while importing source code: " + objRepository.LastFailureMessage + Environment.NewLine);
                     }
                 }
 
@@ -1782,7 +1799,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while importing source code: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while importing source code: " + ex.Message);
             }
         }
 
@@ -1846,7 +1863,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while creating pull Requests: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while creating pull Requests: " + ex.Message);
             }
         }
 
@@ -1955,7 +1972,7 @@ namespace ADOGenerator.Services
 
                         if (!(string.IsNullOrEmpty(objService.LastFailureMessage)))
                         {
-                            AddMessage(model.id.ErrorId(), "Error while creating service endpoint: " + objService.LastFailureMessage + Environment.NewLine);
+                            model.id.ErrorId().AddMessage( "Error while creating service endpoint: " + objService.LastFailureMessage + Environment.NewLine);
                         }
                         else
                         {
@@ -1967,7 +1984,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while creating service endpoint: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while creating service endpoint: " + ex.Message);
             }
         }
 
@@ -2041,7 +2058,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while creating test plan and test suites: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while creating test plan and test suites: " + ex.Message);
             }
         }
 
@@ -2102,7 +2119,7 @@ namespace ADOGenerator.Services
 
                         if (!(string.IsNullOrEmpty(objBuild.LastFailureMessage)))
                         {
-                            AddMessage(id.ErrorId(), "Error while creating build definition: " + objBuild.LastFailureMessage + Environment.NewLine);
+                           id.ErrorId().AddMessage( "Error while creating build definition: " + objBuild.LastFailureMessage + Environment.NewLine);
                         }
                         if (buildResult.Length > 0)
                         {
@@ -2118,7 +2135,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while creating build definition: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while creating build definition: " + ex.Message);
             }
             return flag;
         }
@@ -2145,14 +2162,14 @@ namespace ADOGenerator.Services
 
                     if (!string.IsNullOrEmpty(objBuild.LastFailureMessage))
                     {
-                        AddMessage(model.id.ErrorId(), "Error while Queueing build: " + objBuild.LastFailureMessage + Environment.NewLine);
+                        model.id.ErrorId().AddMessage( "Error while Queueing build: " + objBuild.LastFailureMessage + Environment.NewLine);
                     }
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while Queueing Build: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while Queueing Build: " + ex.Message);
             }
         }
 
@@ -2239,7 +2256,7 @@ namespace ADOGenerator.Services
 
                         if (!(string.IsNullOrEmpty(objRelease.LastFailureMessage)))
                         {
-                            AddMessage(id.ErrorId(), "Error while creating release definition: " + objRelease.LastFailureMessage + Environment.NewLine);
+                           id.ErrorId().AddMessage( "Error while creating release definition: " + objRelease.LastFailureMessage + Environment.NewLine);
                         }
                     }
                     flag = true;
@@ -2249,7 +2266,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(id.ErrorId(), "Error while creating release definition: " + ex.Message);
+               id.ErrorId().AddMessage( "Error while creating release definition: " + ex.Message);
             }
             flag = false;
             return flag;
@@ -2278,7 +2295,7 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objQuery.LastFailureMessage))
                 {
-                    AddMessage(model.id.ErrorId(), "Error while getting dashboardId: " + objWidget.LastFailureMessage + Environment.NewLine);
+                    model.id.ErrorId().AddMessage( "Error while getting dashboardId: " + objWidget.LastFailureMessage + Environment.NewLine);
                 }
                 Queries _newobjQuery = new Queries(_queriesVersion);
                 bool isFolderCreated = false;
@@ -2307,7 +2324,7 @@ namespace ADOGenerator.Services
 
                     if (!string.IsNullOrEmpty(_newobjQuery.LastFailureMessage))
                     {
-                        AddMessage(model.id.ErrorId(), "Error while creating query: " + _newobjQuery.LastFailureMessage + Environment.NewLine);
+                        model.id.ErrorId().AddMessage( "Error while creating query: " + _newobjQuery.LastFailureMessage + Environment.NewLine);
                     }
 
                 }
@@ -2332,43 +2349,7 @@ namespace ADOGenerator.Services
 
                     bool isDashboardDeleted = objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardId, teamName);
 
-                    if (model.SelectedTemplate.ToLower() == "bikesharing360")
-                    {
-                        if (isDashboardDeleted)
-                        {
-                            dashBoardTemplate = model.ReadJsonFile(dashBoardTemplate);
-
-                            string xamarin_DroidBuild = model.BuildDefinitions.Where(x => x.Name == "Xamarin.Droid").FirstOrDefault() != null ? model.BuildDefinitions.Where(x => x.Name == "Xamarin.Droid").FirstOrDefault().Id : string.Empty;
-                            string xamarin_IOSBuild = model.BuildDefinitions.Where(x => x.Name == "Xamarin.iOS").FirstOrDefault() != null ? model.BuildDefinitions.Where(x => x.Name == "Xamarin.iOS").FirstOrDefault().Id : string.Empty;
-                            string ridesApiBuild = model.BuildDefinitions.Where(x => x.Name == "RidesApi").FirstOrDefault() != null ? model.BuildDefinitions.Where(x => x.Name == "RidesApi").FirstOrDefault().Id : string.Empty;
-
-                            ReleaseDefinition objrelease = new ReleaseDefinition(_releaseConfig);
-                            int[] androidEnvironmentIds = objrelease.GetEnvironmentIdsByName(model.ProjectName, "Xamarin.Android", "Test in HockeyApp", "Publish to store");
-                            string androidbuildDefId = model.BuildDefinitions.Where(x => x.Name == "Xamarin.Droid").FirstOrDefault() != null ? model.BuildDefinitions.Where(x => x.Name == "Xamarin.Droid").FirstOrDefault().Id : string.Empty;
-                            string androidreleaseDefId = model.ReleaseDefinitions.Where(x => x.Name == "Xamarin.Android").FirstOrDefault() != null ? model.ReleaseDefinitions.Where(x => x.Name == "Xamarin.Android").FirstOrDefault().Id : string.Empty;
-
-                            int[] iosEnvironmentIds = objrelease.GetEnvironmentIdsByName(model.ProjectName, "Xamarin.iOS", "Test in HockeyApp", "Publish to store");
-                            string iosBuildDefId = model.BuildDefinitions.Where(x => x.Name == "Xamarin.iOS").FirstOrDefault() != null ? model.BuildDefinitions.Where(x => x.Name == "Xamarin.iOS").FirstOrDefault().Id : string.Empty;
-                            string iosReleaseDefId = model.ReleaseDefinitions.Where(x => x.Name == "Xamarin.iOS").FirstOrDefault() != null ? model.ReleaseDefinitions.Where(x => x.Name == "Xamarin.iOS").FirstOrDefault().Id : string.Empty;
-
-                            string ridesApireleaseDefId = model.ReleaseDefinitions.Where(x => x.Name == "RidesApi").FirstOrDefault() != null ? model.ReleaseDefinitions.Where(x => x.Name == "RidesApi").FirstOrDefault().Id : string.Empty;
-                            QueryResponse openUserStories = objQuery.GetQueryByPathAndName(model.ProjectName, "Open User Stories", "Shared%20Queries/Current%20Iteration");
-
-                            dashBoardTemplate = dashBoardTemplate.Replace("$RidesAPIReleaseId$", ridesApireleaseDefId)
-                            .Replace("$RidesAPIBuildId$", ridesApiBuild)
-                            .Replace("$repositoryId$", model.Environment.repositoryIdList.Where(x => x.Key.ToLower() == "bikesharing360").FirstOrDefault().Value)
-                            .Replace("$IOSBuildId$", iosBuildDefId).Replace("$IOSReleaseId$", iosReleaseDefId).Replace("$IOSEnv1$", iosEnvironmentIds[0].ToString()).Replace("$IOSEnv2$", iosEnvironmentIds[1].ToString())
-                            .Replace("$Xamarin.iOS$", xamarin_IOSBuild)
-                            .Replace("$Xamarin.Droid$", xamarin_DroidBuild)
-                            .Replace("$AndroidBuildId$", androidbuildDefId).Replace("$AndroidreleaseDefId$", androidreleaseDefId).Replace("$AndroidEnv1$", androidEnvironmentIds[0].ToString()).Replace("$AndroidEnv2$", androidEnvironmentIds[1].ToString())
-                            .Replace("$OpenUserStoriesId$", openUserStories.id)
-                            .Replace("$projectId$", model.Environment.ProjectId);
-
-                            string isDashBoardCreated = objWidget.CreateNewDashBoard(model.ProjectName, dashBoardTemplate);
-                            objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardIdToDelete);
-                        }
-                    }
-                    if (model.SelectedTemplate == "Gen-MyHealthClinic" || model.SelectedTemplate == "Gen-PartsUnlimited")
+                    if (model.SelectedTemplate.ToLower() == "gen-partsunlimited")
                     {
                         if (isDashboardDeleted)
                         {
@@ -2413,27 +2394,7 @@ namespace ADOGenerator.Services
 
                         }
                     }
-                    if (model.SelectedTemplate.ToLower() == "bikesharing 360")
-                    {
-                        if (isDashboardDeleted)
-                        {
-                            dashBoardTemplate = model.ReadJsonFile(dashBoardTemplate);
-                            QueryResponse unfinishedWork = objQuery.GetQueryByPathAndName(model.ProjectName, "Unfinished Work_WI", "Shared%20Queries");
-                            string allItems = queryResults.Where(x => x.name == "All Items_WI").FirstOrDefault().id;
-                            string repositoryId = model.Environment.repositoryIdList.Where(x => x.Key.ToLower() == "bikesharing360").FirstOrDefault().Key;
-                            string bikeSharing360_PublicWeb = model.BuildDefinitions.Where(x => x.Name == "BikeSharing360-PublicWeb").FirstOrDefault().Id;
-
-                            dashBoardTemplate = dashBoardTemplate.Replace("$BikeSharing360-PublicWeb$", bikeSharing360_PublicWeb)
-                                         .Replace("$All Items$", allItems)
-                                         .Replace("$repositoryId$", repositoryId)
-                                         .Replace("$Unfinished Work$", unfinishedWork.id)
-                                         .Replace("$projectId$", model.Environment.ProjectId);
-
-                            string isDashBoardCreated = objWidget.CreateNewDashBoard(model.ProjectName, dashBoardTemplate);
-                            objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardIdToDelete);
-                        }
-                    }
-                    if (model.SelectedTemplate == "DL-Docker")
+                    if (model.SelectedTemplate.ToLower() == "dl-docker")
                     {
                         if (isDashboardDeleted)
                         {
@@ -2459,7 +2420,7 @@ namespace ADOGenerator.Services
                             objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardIdToDelete);
                         }
                     }
-                    if (model.SelectedTemplate == "Gen-MyShuttle")
+                    if (model.SelectedTemplate.ToLower() == "gen-myshuttle")
                     {
                         if (isDashboardDeleted)
                         {
@@ -2479,28 +2440,7 @@ namespace ADOGenerator.Services
                             objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardIdToDelete);
                         }
                     }
-                    if (model.SelectedTemplate.ToLower() == "myshuttle2")
-                    {
-                        if (isDashboardDeleted)
-                        {
-                            dashBoardTemplate = model.ReadJsonFile(dashBoardTemplate);
-
-                            dashBoardTemplate = dashBoardTemplate.Replace("$TestCases$", queryResults.Where(x => x.name == "Test Cases").FirstOrDefault().id != null ? queryResults.Where(x => x.name == "Test Cases").FirstOrDefault().id : string.Empty)
-                                         .Replace("$AllWorkItems$", queryResults.Where(x => x.name == "All Work Items").FirstOrDefault() != null ? queryResults.Where(x => x.name == "All Work Items").FirstOrDefault().id : string.Empty)
-                                         .Replace("$PBI$", queryResults.Where(x => x.name == "Product Backlog Items").FirstOrDefault() != null ? queryResults.Where(x => x.name == "Product Backlog Items").FirstOrDefault().id : string.Empty)
-                                         .Replace("$RepoMyShuttleCalc$", model.Environment.repositoryIdList["MyShuttleCalc"] != null ? model.Environment.repositoryIdList["MyShuttleCalc"] : string.Empty)
-                                         .Replace("$TestPlan$", queryResults.Where(x => x.name == "Test Plans").FirstOrDefault() != null ? queryResults.Where(x => x.name == "Test Plans").FirstOrDefault().id : string.Empty)
-                                         .Replace("$Tasks$", queryResults.Where(x => x.name == "Tasks").FirstOrDefault() != null ? queryResults.Where(x => x.name == "Tasks").FirstOrDefault().id : string.Empty)
-                                         .Replace("$Bugs$", queryResults.Where(x => x.name == "Bugs").FirstOrDefault() != null ? queryResults.Where(x => x.name == "Bugs").FirstOrDefault().id : string.Empty)
-                                         .Replace("$Features$", queryResults.Where(x => x.name == "Feature").FirstOrDefault() != null ? queryResults.Where(x => x.name == "Feature").FirstOrDefault().id : string.Empty)
-                                         .Replace("$RepoMyShuttle2$", model.Environment.repositoryIdList.Where(x => x.Key.ToLower() == "myshuttle2").FirstOrDefault().ToString() != "" ? model.Environment.repositoryIdList.Where(x => x.Key.ToLower() == "myshuttle2").FirstOrDefault().Value : string.Empty);
-
-
-                            string isDashBoardCreated = objWidget.CreateNewDashBoard(model.ProjectName, dashBoardTemplate);
-                            objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardIdToDelete);
-                        }
-                    }
-                    if (model.SelectedTemplate.ToLower() == "dl-docker" || model.SelectedTemplate.ToLower() == "dl-php" || model.SelectedTemplate.ToLower() == "dl-sonarqube" || model.SelectedTemplate.ToLower() == "dl-github" || model.SelectedTemplate.ToLower() == "dl-whitesource bolt" || model.SelectedTemplate.ToLower() == "dl-DeploymentGroups" || model.SelectedTemplate.ToLower() == "dl-octopus")
+                    if (model.SelectedTemplate.ToLower() == "dl-docker" || model.SelectedTemplate.ToLower() == "dl-php" || model.SelectedTemplate.ToLower() == "dl-sonarqube" || model.SelectedTemplate.ToLower() == "dl-github" || model.SelectedTemplate.ToLower() == "dl-whitesource bolt" || model.SelectedTemplate.ToLower() == "dl-deploymentgroups" || model.SelectedTemplate.ToLower() == "dl-octopus")
                     {
                         if (isDashboardDeleted)
                         {
@@ -2557,7 +2497,6 @@ namespace ADOGenerator.Services
                             objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardIdToDelete);
                         }
                     }
-
                     if (model.SelectedTemplate.ToLower() == "gen-smarthotel360")
                     {
                         if (isDashboardDeleted)
@@ -2602,18 +2541,6 @@ namespace ADOGenerator.Services
 
                         }
                     }
-                    if (model.SelectedTemplate.ToLower() == "contososhuttle" || model.SelectedTemplate.ToLower() == "contososhuttle2")
-                    {
-                        if (isDashboardDeleted)
-                        {
-                            QueryResponse workInProgress = objQuery.GetQueryByPathAndName(model.ProjectName, "Work in Progress_WI", "Shared%20Queries");
-                            dashBoardTemplate = model.ReadJsonFile(dashBoardTemplate);
-                            dashBoardTemplate = dashBoardTemplate.Replace("$WorkinProgress$", workInProgress.id);
-
-                            string isDashBoardCreated = objWidget.CreateNewDashBoard(model.ProjectName, dashBoardTemplate);
-                            objWidget.DeleteDefaultDashboard(model.ProjectName, dashBoardIdToDelete);
-                        }
-                    }
                     if (model.SelectedTemplate.ToLower() == "gen-eshoponweb")
                     {
                         if (isDashboardDeleted)
@@ -2641,12 +2568,12 @@ namespace ADOGenerator.Services
             catch (OperationCanceledException oce)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + oce.Message + "\t" + oce.InnerException.Message + "\n" + oce.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while creating Queries and Widgets: Operation cancelled exception " + oce.Message + "\r\n");
+                model.id.ErrorId().AddMessage( "Error while creating Queries and Widgets: Operation cancelled exception " + oce.Message + "\r\n");
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while creating Queries and Widgets: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while creating Queries and Widgets: " + ex.Message);
             }
         }
 
@@ -2713,11 +2640,11 @@ namespace ADOGenerator.Services
                             }
                             catch (OperationCanceledException cancelException)
                             {
-                                AddMessage(model.id.ErrorId(), "Error while Installing extensions - operation cancelled: " + cancelException.Message + Environment.NewLine);
+                                model.id.ErrorId().AddMessage( "Error while Installing extensions - operation cancelled: " + cancelException.Message + Environment.NewLine);
                             }
                             catch (Exception exc)
                             {
-                                AddMessage(model.id.ErrorId(), "Error while Installing extensions: " + exc.Message);
+                                model.id.ErrorId().AddMessage( "Error while Installing extensions: " + exc.Message);
                             }
                         });
                     }
@@ -2727,7 +2654,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while Installing extensions: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while Installing extensions: " + ex.Message);
                 return false;
             }
         }
@@ -2860,11 +2787,11 @@ namespace ADOGenerator.Services
                                 bool isWiki = manageWiki.CreateCodeWiki(json);
                                 if (isWiki)
                                 {
-                                    AddMessage(model.id, "Created Wiki");
+                                    model.id.AddMessage( "Created Wiki");
                                 }
                                 else if (!string.IsNullOrEmpty(manageWiki.LastFailureMessage))
                                 {
-                                    AddMessage(model.id.ErrorId(), "Error while creating wiki: " + manageWiki.LastFailureMessage);
+                                    model.id.ErrorId().AddMessage("Error while creating wiki: " + manageWiki.LastFailureMessage);
                                 }
                             }
                         }
@@ -2874,7 +2801,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                AddMessage(model.id.ErrorId(), "Error while creating wiki: " + ex.Message);
+                model.id.ErrorId().AddMessage( "Error while creating wiki: " + ex.Message);
             }
         }
         void CreateDeploymentGroup(string templateFolder, Project model, ADOConfiguration _deploymentGroup)
@@ -2890,7 +2817,7 @@ namespace ADOGenerator.Services
                     bool isCreated = deploymentGroup.CreateDeploymentGroup(json);
                     if (isCreated) { }
                     else if (!string.IsNullOrEmpty(deploymentGroup.LastFailureMessage))
-                    { AddMessage(model.id.ErrorId(), "Error while creating deployment group: " + deploymentGroup.LastFailureMessage); }
+                    { model.id.ErrorId().AddMessage( "Error while creating deployment group: " + deploymentGroup.LastFailureMessage); }
                 }
             }
         }

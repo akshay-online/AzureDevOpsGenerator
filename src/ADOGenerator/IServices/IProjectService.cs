@@ -12,8 +12,6 @@ namespace ADOGenerator.IServices
     {
         void RemoveKey(string id);
 
-        void AddMessage(string id, string message);
-
         JObject GetStatusMessage(string id);
 
         HttpResponseMessage GetprojectList(string accname, string pat);
