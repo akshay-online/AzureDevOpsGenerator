@@ -151,7 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiServiceBase.cs" />
-    <Compile Include="Build\BuildDefinition.cs" />
+    <Compile Include="Builds\BuildDefinition.cs" />
     <Compile Include="ADOConfiguration.cs" />
     <Compile Include="DeliveryPlans\Plans.cs" />
     <Compile Include="DeploymentGroup\DeploymentGroup.cs" />
@@ -167,6 +167,7 @@
     <Compile Include="Service\ServiceEndPoint.cs" />
     <Compile Include="Viewmodel\BranchPolicy\BranchPolicy.cs" />
     <Compile Include="Viewmodel\BranchPolicy\BranchPolicyTypes.cs" />
+    <Compile Include="Viewmodel\Builds\BuildGetListofBuildDefinitionsResponse.cs" />
     <Compile Include="Viewmodel\Extractor\BoardColumnResponseAgile.cs" />
     <Compile Include="Viewmodel\Extractor\BoardColumnResponseBasic.cs" />
     <Compile Include="Viewmodel\Extractor\BoardColumnResponseScrum.cs" />
@@ -200,11 +201,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueriesAndWidgets\Queries.cs" />
     <Compile Include="Queues\Queue.cs" />
-    <Compile Include="Release\ReleaseDefinition.cs" />
+    <Compile Include="Releases\ReleaseDefinition.cs" />
     <Compile Include="TestManagement\TestManagement.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="Viewmodel\BaseViewModel.cs" />
-    <Compile Include="Viewmodel\Build\BuildGetListofBuildDefinitionsResponse.cs" />
     <Compile Include="Viewmodel\Extractor\WorkItemFetchResponse.cs" />
     <Compile Include="Viewmodel\Extractor\WorkItemNames.cs" />
     <Compile Include="Viewmodel\GitHub\ForkRepos.cs" />
