@@ -26,7 +26,7 @@ using RestAPI.Viewmodel.Repository;
 using RestAPI.Service;
 using RestAPI.TestManagement;
 using RestAPI.Builds;
-using RestAPI.Releases;
+using RestAPI.ReleasesDef;
 using RestAPI.QueriesAndWidgets;
 using RestAPI.Viewmodel.QueriesAndWidgets;
 using RestAPI.Viewmodel.Sprint;

@@ -201,7 +201,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueriesAndWidgets\Queries.cs" />
     <Compile Include="Queues\Queue.cs" />
-    <Compile Include="Releases\ReleaseDefinition.cs" />
+    <Compile Include="ReleasesDef\ReleaseDefinition.cs" />
     <Compile Include="TestManagement\TestManagement.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="Viewmodel\BaseViewModel.cs" />
