@@ -10,19 +10,6 @@ The Azure DevOps Demo Generator can create projects in your Azure DevOps organiz
 
 The original purpose of this system is to simplify working with the [Azure DevOps hands-on-labs](https://www.azuredevopslabs.com), demos and other education material. But it can also be used to drive your ownAzure DevOps automation utilities, provision your own custom templates, or as a reference for using the [Azure DevOps REST APIs](https://docs.microsoft.com/rest/api/azure/devops/).
 
-## Getting Started
-
-The Azure DevOps Demo Generator is a hosted service that you can [access directly](https://azuredevopsdemogenerator.azurewebsites.net/) to create template-based projects, via [API](./docs/Azure-DevOps-Demo-Generator-REST-API-Reference.md) or as a side effect of the related [Azure DevOps hands-on-labs](https://www.azuredevopslabs.com).
-
-The following docs provide additional information:
-* [Using the Azure DevOps Demo Generator](./docs/Using-The-Generator.md)
-* [Running the Azure DevOps Demo Generator on your local machine](./docs/Local-Development.md)
-* [Creating custom templates](./docs/Using-The-Template-Extractor.md)
-* [Using the REST APIs](./docs/Azure-DevOps-Demo-Generator-REST-API-Reference.md)
-* [Limitations](./docs/Limitations.md)
-* [Contributing to this project](./CONTRIBUTING.md)
-* [FAQ](./docs/FAQ.md)
-
 ## Contributions
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.microsoft.com.
