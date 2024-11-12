@@ -70,7 +70,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\RestAPI\RestAPI.csproj" />
+	  <ProjectReference Include="..\API\API.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
