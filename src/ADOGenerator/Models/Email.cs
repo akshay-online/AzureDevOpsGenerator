@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
+﻿using System.Configuration;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Web;
 
 namespace ADOGenerator.Models
 {
-	public class Email
-	{
-		public string EmailAddress { get; set; }
-		public string AccountName { get; set; }
-		public string ErrorLog { get; set; }
+    public class Email
+    {
+        public string EmailAddress { get; set; }
+        public string AccountName { get; set; }
+        public string ErrorLog { get; set; }
 
-		public bool SendEmail(string toEmail, string body, string subject)
-		{
+        public bool SendEmail(string toEmail, string body, string subject)
+        {
             MailMessage newmsg = new MailMessage(ConfigurationManager.AppSettings["from"], toEmail)
             {
                 //newmsg.From = new MailAddress(ConfigurationManager.AppSettings["from"]);
@@ -41,16 +37,16 @@ namespace ADOGenerator.Models
                 EnableSsl = Convert.ToBoolean(ConfigurationManager.AppSettings["enableSSL"])
             };
             try
-			{
-				ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-				{ return true; };
-				smtp.Send(newmsg);
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-			return true;
-		}
-	}
+            {
+                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+                { return true; };
+                smtp.Send(newmsg);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+    }
 }

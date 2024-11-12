@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace ADOGenerator.Models
+﻿namespace ADOGenerator.Models
 {
     public class Value
     {

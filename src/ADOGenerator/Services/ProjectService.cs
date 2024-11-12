@@ -1,57 +1,51 @@
 ﻿using ADOGenerator.IServices;
 using ADOGenerator.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.ExtensionManagement.WebApi;
+using Microsoft.VisualStudio.Services.WebApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RestAPI;
+using RestAPI.Builds;
+using RestAPI.DeliveryPlans;
+using RestAPI.DeploymentGRoup;
+using RestAPI.Extractor;
 using RestAPI.Git;
 using RestAPI.ProjectsAndTeams;
-using RestAPI.Services;
-using RestAPI.Viewmodel.Extractor;
-using RestAPI.Viewmodel.ProjectAndTeams;
-using RestAPI.WorkItemAndTracking;
-using RestAPI.Viewmodel.Importer;
-using RestAPI.Extractor;
-using RestAPI.DeliveryPlans;
-using RestAPI.Viewmodel.GitHub;
-using RestAPI.Viewmodel.BranchPolicy;
-using RestAPI.Viewmodel.WorkItem;
-using RestAPI.Viewmodel.Repository;
-using RestAPI.Service;
-using RestAPI.TestManagement;
-using RestAPI.Builds;
-using RestAPI.ReleasesDef;
 using RestAPI.QueriesAndWidgets;
+using RestAPI.ReleasesDef;
+using RestAPI.Service;
+using RestAPI.Services;
+using RestAPI.TestManagement;
+using RestAPI.Viewmodel.BranchPolicy;
+using RestAPI.Viewmodel.Extractor;
+using RestAPI.Viewmodel.GitHub;
+using RestAPI.Viewmodel.Importer;
+using RestAPI.Viewmodel.ProjectAndTeams;
 using RestAPI.Viewmodel.QueriesAndWidgets;
+using RestAPI.Viewmodel.Repository;
 using RestAPI.Viewmodel.Sprint;
-using Microsoft.VisualStudio.Services.WebApi;
-using RestAPI.DeploymentGRoup;
 using RestAPI.Viewmodel.Wiki;
+using RestAPI.Viewmodel.WorkItem;
 using RestAPI.Wiki;
-using Microsoft.VisualStudio.Services.ExtensionManagement.WebApi;
-using Microsoft.VisualStudio.Services.Common;
+using RestAPI.WorkItemAndTracking;
+using System.Diagnostics;
 
 namespace ADOGenerator.Services
 {
     public class ProjectService : IProjectService
     {
-        public static readonly object objLock = new object();
-        public static Dictionary<string, string> statusMessages;
+        private static readonly object objLock = new();
+        private static Dictionary<string, string> statusMessages;
 
         public bool isDefaultRepoTodetele = true;
         public string websiteUrl = string.Empty;
         public string templateUsed = string.Empty;
-        public static string projectName = string.Empty;
-        public static AccessDetails AccessDetails = new AccessDetails();
+        private static string projectName = string.Empty;
+        private static AccessDetails AccessDetails = new AccessDetails();
 
-        public string templateVersion = string.Empty;
-        public static string enableExtractor = "";
+        private string templateVersion = string.Empty;
         private readonly IConfiguration _configuration;
 
         public ProjectService(IConfiguration configuration)
@@ -59,21 +53,6 @@ namespace ADOGenerator.Services
             _configuration = configuration;
         }
 
-        //public static async void TrackFeature(string API)
-        //{
-        //    SimpleTrackerEnvironment simpleTrackerEnvironment = new SimpleTrackerEnvironment(Environment.OSVersion.Platform.ToString(),
-        //                                                                    Environment.OSVersion.Version.ToString(),
-        //                                                                    Environment.OSVersion.VersionString);
-        //    string GAKey = ConfigurationManager.AppSettings["AnalyticsKey"];
-        //    if (!string.IsNullOrEmpty(GAKey))
-        //    {
-        //        using (Tracker tracker = new Tracker(GAKey, simpleTrackerEnvironment))
-        //        {
-        //            var response = await tracker.TrackPageViewAsync("My API - Create", API);
-        //            bool issuccess = response.Success;
-        //        }
-        //    }
-        //}
         public static Dictionary<string, string> StatusMessages
         {
             get
@@ -90,45 +69,6 @@ namespace ADOGenerator.Services
                 statusMessages = value;
             }
         }
-        //public void AddMessage(string id, string message)
-        //{
-        //    lock (objLock)
-        //    {
-        //        // Create Log floder
-        //        if (!Directory.Exists("Log"))
-        //        {
-        //            Directory.CreateDirectory("Log");
-        //        }
-        //        string logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Log");
-        //        string fileName = $"{DateTime.Now.ToString("yyyy-MM-dd")}-{id}.txt";
-        //        if (id.EndsWith("_Errors"))
-        //        {
-        //            // Create Log file
-        //            if (!File.Exists(Path.Combine(logFilePath, "Errors", fileName)))
-        //            {
-        //                File.Create(Path.Combine(logFilePath, "Errors", fileName)).Dispose();
-        //            }
-        //            File.AppendAllLines(Path.Combine(logFilePath, "Errors", fileName), new string[] { message });
-        //            Console.ForegroundColor = ConsoleColor.Red;
-        //            Console.WriteLine(message);
-        //            Console.ResetColor();
-        //            StatusMessages[id] = (StatusMessages.ContainsKey(id) ? StatusMessages[id] : string.Empty) + message;
-        //        }
-        //        else
-        //        {
-        //            if (!File.Exists(Path.Combine(logFilePath, fileName)))
-        //            {
-        //                File.Create(Path.Combine(logFilePath, fileName)).Dispose();
-        //            }
-        //            File.AppendAllLines(Path.Combine(logFilePath, fileName), new string[] { message });
-        //            // Create Log file
-        //            Console.ForegroundColor = ConsoleColor.Green;
-        //            StatusMessages[id] = message;
-        //            Console.WriteLine(message);
-        //            Console.ResetColor();
-        //        }
-        //    }
-        //}
         public void RemoveKey(string id)
         {
             lock (objLock)
@@ -164,13 +104,13 @@ namespace ADOGenerator.Services
 
         public HttpResponseMessage GetprojectList(string accname, string pat)
         {
-            string? defaultHost = _configuration["AppSettings:DefaultHost"];
-            if (defaultHost == null)
+            string defaultHost = _configuration["AppSettings:DefaultHost"];
+            if (string.IsNullOrEmpty(defaultHost))
             {
                 throw new InvalidOperationException("DefaultHost configuration is missing.");
             }
 
-            string? ProjectCreationVersion = _configuration["AppSettings:ProjectCreationVersion"];
+            string ProjectCreationVersion = _configuration["AppSettings:ProjectCreationVersion"];
             if (ProjectCreationVersion == null)
             {
                 throw new InvalidOperationException("ProjectCreationVersion configuration is missing.");
@@ -246,12 +186,12 @@ namespace ADOGenerator.Services
             string processTemplateId = Default.SCRUM;
             model.Environment = new EnvironmentValues
             {
-                serviceEndpoints = new Dictionary<string, string>(),
-                repositoryIdList = new Dictionary<string, string>(),
-                pullRequests = new Dictionary<string, string>(),
-                GitHubRepos = new Dictionary<string, string>(),
-                VariableGroups = new Dictionary<int, string>(),
-                ReposImported = new Dictionary<string, bool>()
+                serviceEndpoints = new(),
+                repositoryIdList = new(),
+                pullRequests = new(),
+                GitHubRepos = new(),
+                VariableGroups = new(),
+                ReposImported = new()
             };
             ProjectTemplate template = null;
             ProjectSettings settings = null;
@@ -378,7 +318,7 @@ namespace ADOGenerator.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error in reading project template file");
+                Console.WriteLine("Error in reading project template file:" + ex.Message);
                 // // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             //create team project
@@ -668,7 +608,7 @@ namespace ADOGenerator.Services
                             }
                             catch (Exception ex)
                             {
-
+                                model.id.ErrorId().AddMessage(ex.Message);
                             }
                             // updating card styles for each team and each board
                             string teamCardStyle = "";
@@ -1205,7 +1145,7 @@ namespace ADOGenerator.Services
         /// <param name="_defaultADOConfiguration"></param>
         /// <param name="id"></param>
         /// <param name="teamAreaJSON"></param>
-        void CreateTeams(Project model, string teamsJSON, ADOConfiguration _projectConfig, string id, string teamAreaJSON)
+        void CreateTeams1(Project model, string teamsJSON, ADOConfiguration _projectConfig, string id, string teamAreaJSON)
         {
             try
             {
@@ -1347,6 +1287,134 @@ namespace ADOGenerator.Services
 
             }
         }
+        void CreateTeams(Project model, string teamsJSON, ADOConfiguration _projectConfig, string id, string teamAreaJSON)
+        {
+            try
+            {
+                string jsonTeams = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, model.SelectedTemplate, teamsJSON);
+                if (!File.Exists(jsonTeams)) return;
+
+                Teams objTeam = new Teams(_projectConfig);
+                jsonTeams = model.ReadJsonFile(jsonTeams);
+                JArray jTeams = JsonConvert.DeserializeObject<JArray>(jsonTeams);
+                JContainer teamsParsed = JsonConvert.DeserializeObject<JContainer>(jsonTeams);
+
+                string backlogIteration = objTeam.GetTeamSetting(model.ProjectName);
+                TeamIterationsResponse.Iterations iterations = objTeam.GetAllIterations(model.ProjectName);
+
+                foreach (var jTeam in jTeams)
+                {
+                    string teamIterationMap = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, model.SelectedTemplate, "TeamIterationMap.json");
+                    if (File.Exists(teamIterationMap))
+                    {
+                        MapTeamIterations(model, objTeam, jTeam, teamIterationMap, backlogIteration, iterations, teamAreaJSON);
+                    }
+                    else
+                    {
+                        CreateDefaultTeam(model, objTeam, jTeam, backlogIteration, iterations, teamAreaJSON, teamsParsed, id);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                id.ErrorId().AddMessage("Error while creating teams: " + ex.Message);
+            }
+        }
+
+        private void MapTeamIterations(Project model, Teams objTeam, JToken jTeam, string teamIterationMap, string backlogIteration, TeamIterationsResponse.Iterations iterations, string teamAreaJSON)
+        {
+            string data = model.ReadJsonFile(teamIterationMap);
+            TeamIterations.Map iterationMap = JsonConvert.DeserializeObject<TeamIterations.Map>(data);
+
+            foreach (var teamMap in iterationMap.TeamIterationMap)
+            {
+                if (teamMap.TeamName.ToLower() != jTeam["name"].ToString().ToLower()) continue;
+
+                GetTeamResponse.Team teamResponse = objTeam.CreateNewTeam(jTeam.ToString(), model.ProjectName);
+                if (string.IsNullOrEmpty(teamResponse.id)) continue;
+
+                string areaName = objTeam.CreateArea(model.ProjectName, teamResponse.name);
+                string updateAreaJSON = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, model.SelectedTemplate, teamAreaJSON);
+
+                if (File.Exists(updateAreaJSON))
+                {
+                    updateAreaJSON = model.ReadJsonFile(updateAreaJSON);
+                    updateAreaJSON = updateAreaJSON.Replace("$ProjectName$", model.ProjectName).Replace("$AreaName$", areaName);
+                    objTeam.SetAreaForTeams(model.ProjectName, teamResponse.name, updateAreaJSON);
+                }
+
+                objTeam.SetBackLogIterationForTeam(backlogIteration, model.ProjectName, teamResponse.name);
+
+                foreach (var iteration in iterations.value)
+                {
+                    if (iteration.structureType != "iteration") continue;
+
+                    foreach (var child in iteration.children)
+                    {
+                        if (teamMap.Iterations.Contains(child.name))
+                        {
+                            objTeam.SetIterationsForTeam(child.identifier, teamResponse.name, model.ProjectName);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CreateDefaultTeam(Project model, Teams objTeam, JToken jTeam, string backlogIteration, TeamIterationsResponse.Iterations iterations, string teamAreaJSON, JContainer teamsParsed, string id)
+        {
+
+            string isDefault = jTeam["isDefault"]?.ToString() ?? string.Empty;
+            if (isDefault == "false" || isDefault == "")
+            {
+                GetTeamResponse.Team teamResponse = objTeam.CreateNewTeam(jTeam.ToString(), model.ProjectName);
+                if (!string.IsNullOrEmpty(teamResponse.id))
+                {
+                    model.id.AddMessage(string.Format("{0} team created", teamResponse.name));
+                }
+                string areaName = objTeam.CreateArea(model.ProjectName, teamResponse.name);
+                if (!string.IsNullOrEmpty(areaName))
+                {
+                    model.id.AddMessage(string.Format("{0} team area created", areaName));
+                }
+                string updateAreaJSON = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, model.SelectedTemplate, teamAreaJSON);
+
+                if (File.Exists(updateAreaJSON))
+                {
+                    updateAreaJSON = model.ReadJsonFile(updateAreaJSON);
+                    updateAreaJSON = updateAreaJSON.Replace("$ProjectName$", model.ProjectName).Replace("$AreaName$", areaName);
+                    objTeam.SetAreaForTeams(model.ProjectName, teamResponse.name, updateAreaJSON);
+                }
+
+                objTeam.SetBackLogIterationForTeam(backlogIteration, model.ProjectName, teamResponse.name);
+
+                foreach (var iteration in iterations.value)
+                {
+                    if (iteration.structureType != "iteration") continue;
+
+                    foreach (var child in iteration.children)
+                    {
+                        objTeam.SetIterationsForTeam(child.identifier, teamResponse.name, model.ProjectName);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(objTeam.LastFailureMessage))
+            {
+                id.ErrorId().AddMessage("Error while creating teams: " + objTeam.LastFailureMessage + Environment.NewLine);
+            }
+            if (model.SelectedTemplate.ToLower() == "smarthotel360")
+            {
+                string updateAreaJSON = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, model.SelectedTemplate, "UpdateTeamArea.json");
+
+                if (File.Exists(updateAreaJSON))
+                {
+                    updateAreaJSON = model.ReadJsonFile(updateAreaJSON);
+                    updateAreaJSON = updateAreaJSON.Replace("$ProjectName$", model.ProjectName);
+                    objTeam.UpdateTeamsAreas(model.ProjectName, updateAreaJSON);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Get Team members
@@ -1398,14 +1466,14 @@ namespace ADOGenerator.Services
                     jsonWorkItems = model.ReadJsonFile(jsonWorkItems);
                     JContainer workItemsParsed = JsonConvert.DeserializeObject<JContainer>(jsonWorkItems);
 
-                    id.AddMessage( "Creating " + workItemsParsed.Count + " work items...");
+                    id.AddMessage("Creating " + workItemsParsed.Count + " work items...");
 
                     jsonWorkItems = jsonWorkItems.Replace("$version$", _defaultConfiguration.VersionNumber);
                     bool workItemResult = objWorkItem.CreateWorkItemUsingByPassRules(model.ProjectName, jsonWorkItems);
 
                     if (!(string.IsNullOrEmpty(objWorkItem.LastFailureMessage)))
                     {
-                       id.ErrorId().AddMessage( "Error while creating workitems: " + objWorkItem.LastFailureMessage + Environment.NewLine);
+                        id.ErrorId().AddMessage("Error while creating workitems: " + objWorkItem.LastFailureMessage + Environment.NewLine);
                     }
                 }
 
@@ -1413,7 +1481,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while creating workitems: " + ex.Message);
+                id.ErrorId().AddMessage("Error while creating workitems: " + ex.Message);
 
             }
         }
@@ -1440,13 +1508,13 @@ namespace ADOGenerator.Services
                 }
                 else if (!(string.IsNullOrEmpty(objBoard.LastFailureMessage)))
                 {
-                   id.ErrorId().AddMessage( "Error while updating board column " + objBoard.LastFailureMessage + Environment.NewLine);
+                    id.ErrorId().AddMessage("Error while updating board column " + objBoard.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while updating board column " + ex.Message);
+                id.ErrorId().AddMessage("Error while updating board column " + ex.Message);
             }
             return result;
         }
@@ -1468,13 +1536,13 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objCards.LastFailureMessage))
                 {
-                   id.ErrorId().AddMessage( "Error while updating card fields: " + objCards.LastFailureMessage + Environment.NewLine);
+                    id.ErrorId().AddMessage("Error while updating card fields: " + objCards.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while updating card fields: " + ex.Message);
+                id.ErrorId().AddMessage("Error while updating card fields: " + ex.Message);
 
             }
 
@@ -1496,13 +1564,13 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objCards.LastFailureMessage))
                 {
-                   id.ErrorId().AddMessage( "Error while updating card styles: " + objCards.LastFailureMessage + Environment.NewLine);
+                    id.ErrorId().AddMessage("Error while updating card styles: " + objCards.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while updating card styles: " + ex.Message);
+                id.ErrorId().AddMessage("Error while updating card styles: " + ex.Message);
             }
 
         }
@@ -1524,13 +1592,13 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objCards.LastFailureMessage))
                 {
-                   id.ErrorId().AddMessage( "Error while Setting Epic Settings: " + objCards.LastFailureMessage + Environment.NewLine);
+                    id.ErrorId().AddMessage("Error while Setting Epic Settings: " + objCards.LastFailureMessage + Environment.NewLine);
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while Setting Epic Settings: " + ex.Message);
+                id.ErrorId().AddMessage("Error while Setting Epic Settings: " + ex.Message);
             }
 
         }
@@ -1561,7 +1629,7 @@ namespace ADOGenerator.Services
                     bool workItemUpdateResult = objWorkItem.UpdateWorkItemUsingByPassRules(jsonWorkItemsUpdate, model.ProjectName, currentUser, jsonProjectSettings);
                     if (!(string.IsNullOrEmpty(objWorkItem.LastFailureMessage)))
                     {
-                       id.ErrorId().AddMessage( "Error while updating work items: " + objWorkItem.LastFailureMessage + Environment.NewLine);
+                        id.ErrorId().AddMessage("Error while updating work items: " + objWorkItem.LastFailureMessage + Environment.NewLine);
                     }
                 }
             }
@@ -1569,7 +1637,7 @@ namespace ADOGenerator.Services
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
 
-               id.ErrorId().AddMessage( "Error while updating work items: " + ex.Message);
+                id.ErrorId().AddMessage("Error while updating work items: " + ex.Message);
 
             }
         }
@@ -1619,7 +1687,7 @@ namespace ADOGenerator.Services
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
 
-                model.id.ErrorId().AddMessage( "Error while updating iteration: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while updating iteration: " + ex.Message);
             }
         }
 
@@ -1703,14 +1771,14 @@ namespace ADOGenerator.Services
 
                     if (!(string.IsNullOrEmpty(objClassification.LastFailureMessage)))
                     {
-                        model.id.ErrorId().AddMessage( "Error while updating sprint items: " + objClassification.LastFailureMessage + Environment.NewLine);
+                        model.id.ErrorId().AddMessage("Error while updating sprint items: " + objClassification.LastFailureMessage + Environment.NewLine);
                     }
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while updating sprint items: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while updating sprint items: " + ex.Message);
 
             }
         }
@@ -1734,7 +1802,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while renaming iterations: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while renaming iterations: " + ex.Message);
             }
         }
 
@@ -1791,7 +1859,7 @@ namespace ADOGenerator.Services
 
                     if (!(string.IsNullOrEmpty(objRepository.LastFailureMessage)))
                     {
-                       id.ErrorId().AddMessage( "Error while importing source code: " + objRepository.LastFailureMessage + Environment.NewLine);
+                        id.ErrorId().AddMessage("Error while importing source code: " + objRepository.LastFailureMessage + Environment.NewLine);
                     }
                 }
 
@@ -1799,7 +1867,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while importing source code: " + ex.Message);
+                id.ErrorId().AddMessage("Error while importing source code: " + ex.Message);
             }
         }
 
@@ -1863,7 +1931,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while creating pull Requests: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while creating pull Requests: " + ex.Message);
             }
         }
 
@@ -1972,7 +2040,7 @@ namespace ADOGenerator.Services
 
                         if (!(string.IsNullOrEmpty(objService.LastFailureMessage)))
                         {
-                            model.id.ErrorId().AddMessage( "Error while creating service endpoint: " + objService.LastFailureMessage + Environment.NewLine);
+                            model.id.ErrorId().AddMessage("Error while creating service endpoint: " + objService.LastFailureMessage + Environment.NewLine);
                         }
                         else
                         {
@@ -1984,7 +2052,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while creating service endpoint: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while creating service endpoint: " + ex.Message);
             }
         }
 
@@ -2058,7 +2126,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while creating test plan and test suites: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while creating test plan and test suites: " + ex.Message);
             }
         }
 
@@ -2119,7 +2187,7 @@ namespace ADOGenerator.Services
 
                         if (!(string.IsNullOrEmpty(objBuild.LastFailureMessage)))
                         {
-                           id.ErrorId().AddMessage( "Error while creating build definition: " + objBuild.LastFailureMessage + Environment.NewLine);
+                            id.ErrorId().AddMessage("Error while creating build definition: " + objBuild.LastFailureMessage + Environment.NewLine);
                         }
                         if (buildResult.Length > 0)
                         {
@@ -2135,7 +2203,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while creating build definition: " + ex.Message);
+                id.ErrorId().AddMessage("Error while creating build definition: " + ex.Message);
             }
             return flag;
         }
@@ -2162,14 +2230,14 @@ namespace ADOGenerator.Services
 
                     if (!string.IsNullOrEmpty(objBuild.LastFailureMessage))
                     {
-                        model.id.ErrorId().AddMessage( "Error while Queueing build: " + objBuild.LastFailureMessage + Environment.NewLine);
+                        model.id.ErrorId().AddMessage("Error while Queueing build: " + objBuild.LastFailureMessage + Environment.NewLine);
                     }
                 }
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while Queueing Build: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while Queueing Build: " + ex.Message);
             }
         }
 
@@ -2256,7 +2324,7 @@ namespace ADOGenerator.Services
 
                         if (!(string.IsNullOrEmpty(objRelease.LastFailureMessage)))
                         {
-                           id.ErrorId().AddMessage( "Error while creating release definition: " + objRelease.LastFailureMessage + Environment.NewLine);
+                            id.ErrorId().AddMessage("Error while creating release definition: " + objRelease.LastFailureMessage + Environment.NewLine);
                         }
                     }
                     flag = true;
@@ -2266,7 +2334,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-               id.ErrorId().AddMessage( "Error while creating release definition: " + ex.Message);
+                id.ErrorId().AddMessage("Error while creating release definition: " + ex.Message);
             }
             flag = false;
             return flag;
@@ -2295,7 +2363,7 @@ namespace ADOGenerator.Services
 
                 if (!string.IsNullOrEmpty(objQuery.LastFailureMessage))
                 {
-                    model.id.ErrorId().AddMessage( "Error while getting dashboardId: " + objWidget.LastFailureMessage + Environment.NewLine);
+                    model.id.ErrorId().AddMessage("Error while getting dashboardId: " + objWidget.LastFailureMessage + Environment.NewLine);
                 }
                 Queries _newobjQuery = new Queries(_queriesVersion);
                 bool isFolderCreated = false;
@@ -2324,7 +2392,7 @@ namespace ADOGenerator.Services
 
                     if (!string.IsNullOrEmpty(_newobjQuery.LastFailureMessage))
                     {
-                        model.id.ErrorId().AddMessage( "Error while creating query: " + _newobjQuery.LastFailureMessage + Environment.NewLine);
+                        model.id.ErrorId().AddMessage("Error while creating query: " + _newobjQuery.LastFailureMessage + Environment.NewLine);
                     }
 
                 }
@@ -2568,12 +2636,12 @@ namespace ADOGenerator.Services
             catch (OperationCanceledException oce)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + oce.Message + "\t" + oce.InnerException.Message + "\n" + oce.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while creating Queries and Widgets: Operation cancelled exception " + oce.Message + "\r\n");
+                model.id.ErrorId().AddMessage("Error while creating Queries and Widgets: Operation cancelled exception " + oce.Message + "\r\n");
             }
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while creating Queries and Widgets: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while creating Queries and Widgets: " + ex.Message);
             }
         }
 
@@ -2640,11 +2708,11 @@ namespace ADOGenerator.Services
                             }
                             catch (OperationCanceledException cancelException)
                             {
-                                model.id.ErrorId().AddMessage( "Error while Installing extensions - operation cancelled: " + cancelException.Message + Environment.NewLine);
+                                model.id.ErrorId().AddMessage("Error while Installing extensions - operation cancelled: " + cancelException.Message + Environment.NewLine);
                             }
                             catch (Exception exc)
                             {
-                                model.id.ErrorId().AddMessage( "Error while Installing extensions: " + exc.Message);
+                                model.id.ErrorId().AddMessage("Error while Installing extensions: " + exc.Message);
                             }
                         });
                     }
@@ -2654,7 +2722,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while Installing extensions: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while Installing extensions: " + ex.Message);
                 return false;
             }
         }
@@ -2742,7 +2810,7 @@ namespace ADOGenerator.Services
             }
             catch (Exception ex)
             {
-                // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
+                model.id.ErrorId().AddMessage(ex.Message);
             }
         }
         public void CreateCodeWiki(Project model, ADOConfiguration _wikiConfiguration)
@@ -2787,7 +2855,7 @@ namespace ADOGenerator.Services
                                 bool isWiki = manageWiki.CreateCodeWiki(json);
                                 if (isWiki)
                                 {
-                                    model.id.AddMessage( "Created Wiki");
+                                    model.id.AddMessage("Created Wiki");
                                 }
                                 else if (!string.IsNullOrEmpty(manageWiki.LastFailureMessage))
                                 {
@@ -2801,7 +2869,7 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                model.id.ErrorId().AddMessage( "Error while creating wiki: " + ex.Message);
+                model.id.ErrorId().AddMessage("Error while creating wiki: " + ex.Message);
             }
         }
         void CreateDeploymentGroup(string templateFolder, Project model, ADOConfiguration _deploymentGroup)
@@ -2817,7 +2885,7 @@ namespace ADOGenerator.Services
                     bool isCreated = deploymentGroup.CreateDeploymentGroup(json);
                     if (isCreated) { }
                     else if (!string.IsNullOrEmpty(deploymentGroup.LastFailureMessage))
-                    { model.id.ErrorId().AddMessage( "Error while creating deployment group: " + deploymentGroup.LastFailureMessage); }
+                    { model.id.ErrorId().AddMessage("Error while creating deployment group: " + deploymentGroup.LastFailureMessage); }
                 }
             }
         }
@@ -2844,7 +2912,7 @@ namespace ADOGenerator.Services
             }
             catch (Exception ex)
             {
-                // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
+                Console.WriteLine(ex.Message);
             }
             return string.Empty;
         }
@@ -2887,7 +2955,7 @@ namespace ADOGenerator.Services
             }
             catch (Exception ex)
             {
-                // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
+                Console.WriteLine(ex.Message);
             }
             return false;
         }
@@ -2994,6 +3062,7 @@ namespace ADOGenerator.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
 
             }
         }
@@ -3054,8 +3123,8 @@ namespace ADOGenerator.Services
             }
             catch (Exception ex)
             {
-                // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
-                //return Json(new { message = "Error", status = "false" }, JsonRequestBehavior.AllowGet);
+                Console.WriteLine(ex.Message);
+
                 ExtensionRequired = false;
             }
             return ExtensionRequired;

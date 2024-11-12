@@ -4,12 +4,11 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Compile Remove="IServices\IConfiguration.cs" />
-		<Compile Remove="Services\Configuration.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- Include the files you want to copy -->
@@ -24,6 +23,45 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
+	  <None Remove="Templates\DL-DeploymentGroups\TeamArea.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Deployment Group Team\BoardColumns.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Deployment Group Team\BoardRows.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Deployment Group Team\CardFields.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Deployment Group Team\CardStyles.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Deployment Group Team\TeamSetting.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team1\BoardColumns.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team1\BoardRows.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team1\CardFields.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team1\CardStyles.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team1\TeamSetting.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team2\BoardColumns.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team2\BoardRows.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team2\CardFields.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team2\CardStyles.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Team2\TeamSetting.json" />
+	  <None Remove="Templates\DL-DeploymentGroups\Teams\Teams.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Octopus Team\BoardColumns.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Octopus Team\BoardRows.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Octopus Team\CardFields.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Octopus Team\CardStyles.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Octopus Team\TeamSetting.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team1\BoardColumns.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team1\BoardRows.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team1\CardFields.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team1\CardStyles.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team1\TeamSetting.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team2\BoardColumns.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team2\BoardRows.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team2\CardFields.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team2\CardStyles.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Team2\TeamSetting.json" />
+	  <None Remove="Templates\DL-Octopus\Teams\Teams.json" />
+	  <None Remove="Templates\DL-Octopus\WorkItems\Epic.json" />
+	  <None Remove="Templates\DL-Octopus\WorkItems\Feature.json" />
+	  <None Remove="Templates\DL-Octopus\WorkItems\Product Backlog Item.json" />
+	  <None Remove="Templates\DL-Octopus\WorkItems\Task.json" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
@@ -32,7 +70,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\RestAPI\RestAPI.csproj" />
+	  <ProjectReference Include="..\API\API.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

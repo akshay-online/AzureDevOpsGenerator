@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ADOGenerator.Models
+﻿namespace ADOGenerator.Models
 {
     public class ProjectList
     {
