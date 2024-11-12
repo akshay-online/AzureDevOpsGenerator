@@ -15,6 +15,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information on contributing, please visit the [contributor guide](./CONTRIBUTING.md).
 
-Contributors:
+# Contributors:
 
 - [Akshay Hosur](https://github.com/akshay-online)
