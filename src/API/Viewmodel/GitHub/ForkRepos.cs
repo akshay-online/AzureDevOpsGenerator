@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RestAPI.Viewmodel.GitHub
+﻿namespace RestAPI.Viewmodel.GitHub
 {
     public class ForkRepos
     {

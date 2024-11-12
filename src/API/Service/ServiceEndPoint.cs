@@ -1,11 +1,9 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using System;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.Extractor;
 using RestAPI.Viewmodel.Service;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.Service
 {
@@ -48,7 +46,7 @@ namespace RestAPI.Service
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateServiceEndPoint" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateServiceEndPoint" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new ServiceEndpointModel();
         }
@@ -78,7 +76,7 @@ namespace RestAPI.Service
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "GetServiceEndPoints" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "GetServiceEndPoints" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new GetServiceEndpoints.ServiceEndPoint();
         }

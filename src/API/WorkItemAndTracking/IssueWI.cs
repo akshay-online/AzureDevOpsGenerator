@@ -1,6 +1,5 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using System;
 using RestAPI.Services;
 
 namespace RestAPI.WorkItemAndTracking
@@ -32,7 +31,7 @@ namespace RestAPI.WorkItemAndTracking
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
         }
 
@@ -65,7 +64,7 @@ namespace RestAPI.WorkItemAndTracking
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
         }
     }

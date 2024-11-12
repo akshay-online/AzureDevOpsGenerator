@@ -1,12 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using RestAPI.Viewmodel.Plans;
+using System.Text;
 using static RestAPI.Viewmodel.Plans.DeliveryPlans;
 
 namespace RestAPI.DeliveryPlans
@@ -135,9 +129,9 @@ namespace RestAPI.DeliveryPlans
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
             return new APlan.Root();
         }

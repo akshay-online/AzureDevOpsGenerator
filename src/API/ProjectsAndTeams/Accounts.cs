@@ -1,6 +1,4 @@
 ﻿using log4net;
-using System;
-using System.Net.Http;
 using RestAPI.Viewmodel.ProjectAndTeams;
 using System.Net.Http.Json;
 
@@ -34,7 +32,7 @@ namespace RestAPI.ProjectsAndTeams
                     return viewModel;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateReleaseDefinition" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }

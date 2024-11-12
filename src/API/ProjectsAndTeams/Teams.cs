@@ -1,11 +1,9 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.ProjectAndTeams;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.ProjectsAndTeams
 {
@@ -49,7 +47,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateNewTeam" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateNewTeam" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new GetTeamResponse.Team();
         }
@@ -84,7 +82,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetTeamMembers \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetTeamMembers \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new TeamMemberResponse.TeamMembers();
         }
@@ -129,7 +127,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t CreateArea \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t CreateArea \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return string.Empty;
         }
@@ -168,7 +166,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetAreaForTeams \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetAreaForTeams \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return false;
         }
@@ -199,7 +197,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetAreaForTeams \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetAreaForTeams \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return string.Empty;
         }
@@ -237,7 +235,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetBackLogIterationForTeam \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetBackLogIterationForTeam \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return false;
         }
@@ -270,7 +268,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetAllIterations \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetAllIterations \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new TeamIterationsResponse.Iterations();
         }
@@ -310,7 +308,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetIterationsForTeam \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t SetIterationsForTeam \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return false;
         }
@@ -345,7 +343,7 @@ namespace RestAPI.ProjectsAndTeams
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetTeamByName \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetTeamByName \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new TeamResponse();
         }
@@ -380,9 +378,9 @@ namespace RestAPI.ProjectsAndTeams
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetTeamByName \t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t GetTeamByName \t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return false;
         }

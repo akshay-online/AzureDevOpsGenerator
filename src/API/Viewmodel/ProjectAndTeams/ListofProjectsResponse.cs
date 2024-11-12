@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RestAPI.Viewmodel.ProjectAndTeams
+﻿namespace RestAPI.Viewmodel.ProjectAndTeams
 {
     public class ProjectsResponse
     {

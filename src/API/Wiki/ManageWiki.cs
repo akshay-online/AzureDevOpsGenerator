@@ -1,9 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using System;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.Wiki;
+using System.Text;
 
 namespace RestAPI.Wiki
 {
@@ -146,7 +144,7 @@ namespace RestAPI.Wiki
                     }
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateNewTeam" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
@@ -177,7 +175,7 @@ namespace RestAPI.Wiki
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateNewTeam" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }

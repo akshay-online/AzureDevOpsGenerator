@@ -1,11 +1,8 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.Queue;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.Queues
 {
@@ -50,7 +47,7 @@ namespace RestAPI.Queues
 
                 return dicQueues;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateReleaseDefinition" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
@@ -92,7 +89,7 @@ namespace RestAPI.Queues
 
                 return viewModel.id;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateReleaseDefinition" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }

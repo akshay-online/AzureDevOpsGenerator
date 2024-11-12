@@ -1,14 +1,11 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.BranchPolicy;
 using RestAPI.Viewmodel.Extractor;
 using RestAPI.Viewmodel.Queue;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.Extractor
 {
@@ -163,7 +160,7 @@ namespace RestAPI.Extractor
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + ex.Message + "\n" + ex.StackTrace + "\n");
             }

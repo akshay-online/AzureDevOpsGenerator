@@ -1,12 +1,9 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.ProjectAndTeams;
 using RestAPI.Viewmodel.WorkItem;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.WorkItemAndTracking
 {
@@ -122,7 +119,7 @@ namespace RestAPI.WorkItemAndTracking
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "GetBoardColumns" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
@@ -152,7 +149,7 @@ namespace RestAPI.WorkItemAndTracking
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "GetBoardColumnsAgile" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }

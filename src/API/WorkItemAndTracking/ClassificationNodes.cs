@@ -1,14 +1,10 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Text;
 using RestAPI.ProjectsAndTeams;
 using RestAPI.Viewmodel.Sprint;
 using RestAPI.Viewmodel.WorkItem;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.WorkItemAndTracking
 {

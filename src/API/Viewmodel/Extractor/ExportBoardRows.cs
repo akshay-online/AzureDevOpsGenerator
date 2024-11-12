@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RestAPI.Viewmodel.Extractor
+﻿namespace RestAPI.Viewmodel.Extractor
 {
     public class ExportBoardRows
     {

@@ -1,11 +1,8 @@
 ﻿using log4net;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.Repository;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.Git
 {

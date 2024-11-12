@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestAPI.Viewmodel.Repository
 {
@@ -15,7 +10,7 @@ namespace RestAPI.Viewmodel.Repository
             public string content { get; set; }
             public string commentType { get; set; }
         }
-        public class reply
+        public class Reply
         {
             public string content { get; set; }
             public string parentCommentId { get; set; }
@@ -67,7 +62,7 @@ namespace RestAPI.Viewmodel.Repository
             public Properties properties { get; set; }
             public PullRequestThreadContext pullRequestThreadContext { get; set; }
             public ThreadContext threadContext { get; set; }
-            public IList<reply> Replies { get; set; }
+            public IList<Reply> Replies { get; set; }
 
         }
 

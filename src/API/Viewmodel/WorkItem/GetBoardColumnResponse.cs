@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestAPI.Viewmodel.WorkItem
 {
@@ -45,7 +40,7 @@ namespace RestAPI.Viewmodel.WorkItem
         {
             [JsonProperty(PropertyName = "Product Backlog Item")]
             public string PBI { get; set; }
-            [JsonProperty(PropertyName ="Bug")]
+            [JsonProperty(PropertyName = "Bug")]
             public string bug { get; set; }
             [JsonProperty(PropertyName = "Epic")]
             public string epic { get; set; }

@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace RestAPI.Viewmodel.WorkItem
+﻿namespace RestAPI.Viewmodel.WorkItem
 {
     public class GetNodesResponse
     {

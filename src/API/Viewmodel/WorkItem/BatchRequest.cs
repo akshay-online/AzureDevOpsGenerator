@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RestAPI.Viewmodel.WorkItem
+﻿namespace RestAPI.Viewmodel.WorkItem
 {
     public class BatchRequest
     {
@@ -23,5 +21,5 @@ namespace RestAPI.Viewmodel.WorkItem
         }
     }
 
-   
+
 }

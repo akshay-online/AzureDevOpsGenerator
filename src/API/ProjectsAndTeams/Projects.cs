@@ -1,14 +1,11 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Extractor;
 using RestAPI.Viewmodel.Extractor;
 using RestAPI.Viewmodel.ProjectAndTeams;
+using System.Net;
+using System.Text;
 
 
 

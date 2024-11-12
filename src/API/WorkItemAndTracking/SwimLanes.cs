@@ -1,6 +1,4 @@
 ﻿using log4net;
-using System;
-using System.Net.Http;
 using System.Text;
 
 namespace RestAPI.WorkItemAndTracking
@@ -42,7 +40,7 @@ namespace RestAPI.WorkItemAndTracking
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "Project template setting" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "Project template setting" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return false;
         }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RestAPI.Viewmodel.Importer
+﻿namespace RestAPI.Viewmodel.Importer
 {
     public class ImportBoardRows
     {

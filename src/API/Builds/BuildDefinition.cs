@@ -1,9 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.Builds;
+using System.Text;
 
 
 namespace RestAPI.Builds
@@ -54,9 +52,9 @@ namespace RestAPI.Builds
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateBuildDefinition" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateBuildDefinition" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new string[] { };
         }
@@ -93,9 +91,9 @@ namespace RestAPI.Builds
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "QueueBuild" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "QueueBuild" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return -1;
         }

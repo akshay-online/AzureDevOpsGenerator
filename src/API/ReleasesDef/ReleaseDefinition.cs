@@ -1,10 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.ReleaseDefinition;
+using System.Text;
 
 namespace RestAPI.ReleasesDef
 {
@@ -50,7 +47,7 @@ namespace RestAPI.ReleasesDef
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateReleaseDefinition" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateReleaseDefinition" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return new string[] { };
         }
@@ -81,7 +78,7 @@ namespace RestAPI.ReleasesDef
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateRelease" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "CreateRelease" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return false;
         }
@@ -117,7 +114,7 @@ namespace RestAPI.ReleasesDef
             }
             catch (Exception ex)
             {
-                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "GetEnvironmentIdsByName" + "\t" + ex.Message + "\t"   + "\n" + ex.StackTrace + "\n");
+                logger.Debug(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "GetEnvironmentIdsByName" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             return environmentIds;
         }

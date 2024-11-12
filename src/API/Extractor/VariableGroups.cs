@@ -1,9 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
-using System;
-using System.Net.Http;
-using System.Text;
 using RestAPI.Viewmodel.Extractor;
+using System.Text;
 
 namespace RestAPI.Extractor
 {

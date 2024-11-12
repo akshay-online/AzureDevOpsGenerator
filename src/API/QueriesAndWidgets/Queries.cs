@@ -1,13 +1,10 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
 using RestAPI.Viewmodel.Extractor;
 using RestAPI.Viewmodel.QueriesAndWidgets;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace RestAPI.QueriesAndWidgets
 {
