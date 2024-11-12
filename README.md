@@ -1,14 +1,11 @@
 # Azure DevOps Demo Generator
 
-   [![Build status](https://vstsdemodata.visualstudio.com/VSTSDemoGenerator/_apis/build/status/VSTSDemoGenerator-Prod)](https://vstsdemodata.visualstudio.com/VSTSDemoGenerator/_build/latest?definitionId=76)
-
-[![Release status](https://vsrm.dev.azure.com/vstsdemodata/_apis/public/Release/badge/89b9b739-9a1c-4739-8aae-6a8a1eb67ee7/2/4)](https://vsrm.dev.azure.com/vstsdemodata/_apis/public/Release/badge/89b9b739-9a1c-4739-8aae-6a8a1eb67ee7/2/4)
 
 ## About
 
 The Azure DevOps Demo Generator can create projects in your Azure DevOps organization, prepopulated with template-based content including source code, work items, iterations, service endpoints, build and release definitions, and more!
 
-The original purpose of this system is to simplify working with the [Azure DevOps hands-on-labs](https://www.azuredevopslabs.com), demos and other education material. But it can also be used to drive your ownAzure DevOps automation utilities, provision your own custom templates, or as a reference for using the [Azure DevOps REST APIs](https://docs.microsoft.com/rest/api/azure/devops/).
+The original purpose of this system is to simplify working with the [Azure DevOps hands-on-labs](https://www.azuredevopslabs.com), demos and other education material. But it can also be used to drive your ownAzure DevOps automation utilities, provision your own custom templates, or as a reference for using the [Azure DevOps REST APIs](https://learn.microsoft.com/en-us/rest/api/azure/devops/).
 
 ## Contributions
 
@@ -18,3 +15,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information on contributing, please visit the [contributor guide](./CONTRIBUTING.md).
 
+Contributors:
+
+- [Akshay Hosur](https://github.com/akshay-online)
