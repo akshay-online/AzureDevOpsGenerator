@@ -1,13 +1,9 @@
-akshay-online: @workspace my start project is ADOGenerator, how to run the solution as console applicaiton or exe. Write a document in .md format
-
-Workspace: # Running the ADOGenerator Project as a Console Application
-
 To run the ADOGenerator project as a console application or executable, follow these steps:
 
 ## Prerequisites
 
 Ensure you have the following installed on your machine:
-- [.NET SDK](https://dotnet.microsoft.com/download) (version compatible with the project)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Visual Studio](https://visualstudio.microsoft.com/) or any other preferred IDE
 
 ## Steps
@@ -20,38 +16,24 @@ Ensure you have the following installed on your machine:
    ```
 
 2. **Open the Solution**
-   Open the 
-
-ADOGenerator.sln
-
- solution file in Visual Studio or your preferred IDE.
+   Open the ADOGenerator.sln solution file in Visual Studio or your preferred IDE.
 
 3. **Set ADOGenerator as the Startup Project**
    In Visual Studio:
-   - Right-click on the 
-
-ADOGenerator
-
- project in the Solution Explorer.
-   - Select 
-
-Set as Startup Project
-
-.
+   - Right-click on the ADOGenerator   project in the Solution Explorer.
+   - Select Set as Startup Project.
 
 4. **Build the Solution**
    Build the solution to ensure all dependencies are restored and the project compiles successfully:
-   ```sh
-   dotnet build
-   ```
+   - In Visual Studio, right-click on the solution in the Solution Explorer and select `Build Solution`.
+   - Alternatively, you can use the command line:
+     ```sh
+     dotnet build
+     ```
 
 5. **Run the Project**
    To run the project as a console application:
-   - In Visual Studio, press `F5` or click on the 
-
-Start
-
- button.
+   - In Visual Studio, press `F5` or click on the Start button.
    - Alternatively, you can run the project from the command line:
      ```sh
      dotnet run --project src/ADOGenerator/ADOGenerator.csproj
@@ -59,10 +41,12 @@ Start
 
 6. **Publish the Project**
    To create an executable, publish the project:
-   ```sh
-   dotnet publish src/ADOGenerator/ADOGenerator.csproj -c Release -r win-x64 --self-contained
-   ```
-   This command will generate an executable in the `bin/Release/net8.0/win-x64/publish` directory (adjust the framework and runtime identifier as needed).
+   - In Visual Studio, right-click on the ADOGenerator project in the Solution Explorer and select `Publish`.
+   - Follow the prompts to configure the publish settings (e.g., target folder, configuration, etc.).
+   - Alternatively, you can use the command line:
+     ```sh
+     dotnet publish src/ADOGenerator/ADOGenerator.csproj -c Release -r win-x64 --self-contained
+     ```
 
 7. **Run the Executable**
    Navigate to the publish directory and run the executable:
