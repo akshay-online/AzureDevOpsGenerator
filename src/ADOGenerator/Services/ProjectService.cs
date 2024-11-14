@@ -146,17 +146,6 @@ namespace ADOGenerator.Services
         //public string[] CreateProjectEnvironment(string accountName, string newProjectName, string token, string templateFolder, string templateUsed)
         public string[] CreateProjectEnvironment(Project model)
         {
-            //model.ProjectName = newProjectName;
-            //model.accountName = accountName;
-            //model.accessToken = token;
-            // string accountName = model.accountName;
-            //if (model.IsPrivatePath)
-            //{
-            //    templateUsed = model.PrivateTemplateName;
-            //}
-            //else
-            //{
-            //}
             string pat = model.accessToken;
             string templateUsed = model.selectedTemplateFolder;
             string accountName = model.accountName;
@@ -408,11 +397,9 @@ namespace ADOGenerator.Services
             if (teamMember != null)
             {
                 model.Environment.UserUniquename = model.Environment.UserUniquename ?? teamMember.identity.uniqueName;
-            }
-            if (teamMember != null)
-            {
                 model.Environment.UserUniqueId = model.Environment.UserUniqueId ?? teamMember.identity.id;
             }
+           
             //model.Environment.UserUniqueId = model.Email;
             //model.Environment.UserUniquename = model.Email;
             //update board columns and rows
@@ -424,105 +411,10 @@ namespace ADOGenerator.Services
                 JObject jObject = JsonConvert.DeserializeObject<JObject>(projectTemplate);
                 templateVersion = jObject["TemplateVersion"] == null ? string.Empty : jObject["TemplateVersion"].ToString();
             }
-            if (templateVersion != "2.0")
-            {
-                UpdateIterations(model, _boardVersion, "Iterations.json");
-                //create teams
-                CreateTeams(model, template.Teams, _projectCreationVersion, model.id, template.TeamArea);
-
-                // for older templates
-                string projectSetting = File.ReadAllText(GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "ProjectSettings.json"));
-                // File.ReadAllText( Path.Combine(templatesFolder + templateUsed, "ProjectSettings.json"));
-                JObject projectObj = JsonConvert.DeserializeObject<JObject>(projectSetting);
-                string processType = projectObj["type"] == null ? string.Empty : projectObj["type"].ToString();
-                string boardType = string.Empty;
-                if (processType == "" || processType == "Scrum")
-                {
-                    processType = "Scrum";
-                    boardType = "Backlog%20items";
-                }
-                else if (processType == "Basic")
-                {
-                    boardType = "Issue";
-                }
-                else
-                {
-                    boardType = "Stories";
-                }
-                BoardColumn objBoard = new BoardColumn(_boardVersion);
-                string updateSwimLanesJSON = "";
-                if (template.BoardRows != null)
-                {
-                    updateSwimLanesJSON = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.BoardRows);
-                    // Path.Combine(templatesFolder + templateUsed, template.BoardRows);
-                    SwimLanes objSwimLanes = new SwimLanes(_boardVersion);
-                    if (File.Exists(updateSwimLanesJSON))
-                    {
-                        updateSwimLanesJSON = File.ReadAllText(updateSwimLanesJSON);
-                        bool isUpdated = objSwimLanes.UpdateSwimLanes(updateSwimLanesJSON, model.ProjectName, boardType, model.ProjectName + " Team");
-                    }
-                }
-                if (template.SetEpic != null)
-                {
-                    string team = model.ProjectName + " Team";
-                    string json = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.SetEpic);
-                    //string.Format(templatesFolder + @"{0}\{1}", templateUsed, template.SetEpic);
-                    if (File.Exists(json))
-                    {
-                        json = model.ReadJsonFile(json);
-                        EnableEpic(model, json, _boardVersion, model.id, team);
-                    }
-                }
-
-                if (template.BoardColumns != null)
-                {
-                    string team = model.ProjectName + " Team";
-                    string json = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.BoardColumns);
-                    //string.Format(templatesFolder + @"{0}\{1}", templateUsed, template.BoardColumns);
-                    if (File.Exists(json))
-                    {
-                        json = model.ReadJsonFile(json);
-                        bool success = UpdateBoardColumn(model, json, _boardVersion, model.id, boardType, team);
-                        if (success)
-                        {
-                            //update Card Fields
-                            if (template.CardField != null)
-                            {
-                                string cardFieldJson = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.CardField);
-                                //string.Format(templatesFolder + @"{0}\{1}", templateUsed, template.CardField);
-                                if (File.Exists(cardFieldJson))
-                                {
-                                    cardFieldJson = model.ReadJsonFile(cardFieldJson);
-                                    UpdateCardFields(model, cardFieldJson, _boardVersion, model.id, boardType, model.ProjectName + " Team");
-                                }
-                            }
-                            //Update card styles
-                            if (template.CardStyle != null)
-                            {
-                                string cardStyleJson = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.CardStyle);
-                                //string.Format(templatesFolder + @"{0}\{1}", templateUsed, template.CardStyle);
-                                if (File.Exists(cardStyleJson))
-                                {
-                                    cardStyleJson = model.ReadJsonFile(cardStyleJson);
-                                    UpdateCardStyles(model, cardStyleJson, _boardVersion, model.id, boardType, model.ProjectName + " Team");
-                                }
-                            }
-                            //Enable Epic Backlog
-                            model.id.AddMessage("Board-Column, Swimlanes, Styles updated");
-                        }
-                    }
-                }
-
-                //update sprint dates
-                UpdateSprintItems(model, _boardVersion, settings);
-                RenameIterations(model, _boardVersion, settings.renameIterations);
-            }
-            else
             {
                 UpdateIterations(model, _boardVersion, "Iterations.json");
                 // for newer version of templates
                 string teamsJsonPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "Teams\\Teams.json");
-                // Path.Combine(templatesFolder + templateUsed, "Teams\\Teams.json");
                 if (File.Exists(teamsJsonPath))
                 {
                     template.Teams = "Teams\\Teams.json";
@@ -534,41 +426,27 @@ namespace ADOGenerator.Services
                     _buildVersion.ProjectId = model.Environment.ProjectId;
                     foreach (var jteam in jTeams)
                     {
-                        string _teamName = string.Empty;
-                        string isDefault = jteam["isDefault"] != null ? jteam["isDefault"].ToString() : string.Empty;
-                        if (isDefault == "true")
-                        {
-                            _teamName = model.ProjectName + " Team";
-                        }
-                        else
-                        {
-                            _teamName = jteam["name"].ToString();
-                        }
-                        string teamFolderPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "Teams\\" + jteam["name"].ToString());
-                        // Path.Combine(templatesFolder + templateUsed, "Teams", jteam["name"].ToString());
+                        string _teamName = jteam["isDefault"]?.ToString() == "true" ? model.ProjectName + " Team" : jteam["name"].ToString();
+                        string teamFolderPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, $"Teams\\{jteam["name"]}");
                         if (Directory.Exists(teamFolderPath))
                         {
                             BoardColumn objBoard = new BoardColumn(_boardVersion);
 
                             // updating swimlanes for each teams each board(epic, feature, PBI, Stories) 
-                            string updateSwimLanesJSON = "";
-                            SwimLanes objSwimLanes = new SwimLanes(_boardVersion);
-                            template.BoardRows = "BoardRows.json";
-                            updateSwimLanesJSON = Path.Combine(teamFolderPath, template.BoardRows);
+                            string updateSwimLanesJSON = Path.Combine(teamFolderPath, "BoardRows.json");
                             if (File.Exists(updateSwimLanesJSON))
                             {
                                 updateSwimLanesJSON = File.ReadAllText(updateSwimLanesJSON);
                                 List<ImportBoardRows.Rows> importRows = JsonConvert.DeserializeObject<List<ImportBoardRows.Rows>>(updateSwimLanesJSON);
                                 foreach (var board in importRows)
                                 {
-                                    bool isUpdated = objSwimLanes.UpdateSwimLanes(JsonConvert.SerializeObject(board.value), model.ProjectName, board.BoardName, _teamName);
+                                    SwimLanes objSwimLanes = new SwimLanes(_boardVersion);
+                                    objSwimLanes.UpdateSwimLanes(JsonConvert.SerializeObject(board.value), model.ProjectName, board.BoardName, _teamName);
                                 }
                             }
 
                             // updating team setting for each team
-                            string teamSettingJson = "";
-                            template.SetEpic = "TeamSetting.json";
-                            teamSettingJson = Path.Combine(teamFolderPath, template.SetEpic);
+                            string teamSettingJson = Path.Combine(teamFolderPath, "TeamSetting.json");
                             if (File.Exists(teamSettingJson))
                             {
                                 teamSettingJson = File.ReadAllText(teamSettingJson);
@@ -576,30 +454,25 @@ namespace ADOGenerator.Services
                             }
 
                             // updating board columns for each teams each board
-                            string teamBoardColumns = "";
-                            template.BoardColumns = "BoardColumns.json";
-                            teamBoardColumns = Path.Combine(teamFolderPath, template.BoardColumns);
+                            string teamBoardColumns = Path.Combine(teamFolderPath, "BoardColumns.json");
                             if (File.Exists(teamBoardColumns))
                             {
                                 teamBoardColumns = File.ReadAllText(teamBoardColumns);
                                 List<ImportBoardColumns.ImportBoardCols> importBoardCols = JsonConvert.DeserializeObject<List<ImportBoardColumns.ImportBoardCols>>(teamBoardColumns);
                                 foreach (var board in importBoardCols)
                                 {
-                                    bool success = UpdateBoardColumn(model, JsonConvert.SerializeObject(board.value, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), _boardVersion, model.id, board.BoardName, _teamName);
+                                    UpdateBoardColumn(model, JsonConvert.SerializeObject(board.value, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), _boardVersion, model.id, board.BoardName, _teamName);
                                 }
                             }
 
                             // updating card fields for each team and each board
                             try
                             {
-                                string teamCardFields = "";
-                                template.CardField = "CardFields.json";
-                                teamCardFields = Path.Combine(teamFolderPath, template.CardField);
+                                string teamCardFields = Path.Combine(teamFolderPath, "CardFields.json");
                                 if (File.Exists(teamCardFields))
                                 {
                                     teamCardFields = File.ReadAllText(teamCardFields);
-                                    List<ImportCardFields.CardFields> cardFields = new List<ImportCardFields.CardFields>();
-                                    cardFields = JsonConvert.DeserializeObject<List<ImportCardFields.CardFields>>(teamCardFields);
+                                    List<ImportCardFields.CardFields> cardFields = JsonConvert.DeserializeObject<List<ImportCardFields.CardFields>>(teamCardFields);
                                     foreach (var card in cardFields)
                                     {
                                         UpdateCardFields(model, JsonConvert.SerializeObject(card, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), _boardVersion, model.id, card.BoardName, _teamName);
@@ -610,15 +483,13 @@ namespace ADOGenerator.Services
                             {
                                 model.id.ErrorId().AddMessage(ex.Message);
                             }
+
                             // updating card styles for each team and each board
-                            string teamCardStyle = "";
-                            template.CardStyle = "CardStyles.json";
-                            teamCardStyle = Path.Combine(teamFolderPath, template.CardStyle);
+                            string teamCardStyle = Path.Combine(teamFolderPath, "CardStyles.json");
                             if (File.Exists(teamCardStyle))
                             {
                                 teamCardStyle = File.ReadAllText(teamCardStyle);
-                                List<CardStyle.Style> cardStyles = new List<CardStyle.Style>();
-                                cardStyles = JsonConvert.DeserializeObject<List<CardStyle.Style>>(teamCardStyle);
+                                List<CardStyle.Style> cardStyles = JsonConvert.DeserializeObject<List<CardStyle.Style>>(teamCardStyle);
                                 foreach (var cardStyle in cardStyles)
                                 {
                                     if (cardStyle.rules.fill != null)
@@ -628,8 +499,7 @@ namespace ADOGenerator.Services
                                 }
                             }
 
-                            template.IncludeSubAreas = "IncludeSubAreas.json";
-                            string includeSubArea = Path.Combine(teamFolderPath, template.IncludeSubAreas);
+                            string includeSubArea = Path.Combine(teamFolderPath, "IncludeSubAreas.json");
                             if (File.Exists(includeSubArea))
                             {
                                 Teams objTeam = new Teams(_boardVersion);
@@ -647,8 +517,8 @@ namespace ADOGenerator.Services
                                 board.IncludeSubAreas(JsonConvert.SerializeObject(subAreas), _boardVersion, teamRes);
                             }
                         }
-                        model.id.AddMessage("Board-Column, Swimlanes, Styles updated");
                     }
+                    model.id.AddMessage("Board-Column, Swimlanes, Styles updated");
                     UpdateSprintItems(model, _boardVersion, settings);
 
                     RenameIterations(model, _boardVersion, settings.renameIterations);
@@ -697,6 +567,7 @@ namespace ADOGenerator.Services
             }
             foreach (string importSourceCode in listImportSourceCodeJsonPaths)
             {
+                model.id.AddMessage("Importing source code");
                 ImportSourceCode(model, importSourceCode, _repoVersion, model.id, _getSourceCodeVersion);
             }
             if (isDefaultRepoTodetele)
@@ -725,107 +596,8 @@ namespace ADOGenerator.Services
                 CreatePullRequest(model, pullReq, _workItemsVersion);
             }
 
-            //Configure account users
-            //if (model.UserMethod == "Select")
-            //{
-            //    model.selectedUsers = model.selectedUsers.TrimEnd(',');
-            //    model.accountUsersForWi = model.selectedUsers.Split(',').ToList();
-            //}
-            //else if (model.UserMethod == "Random")
-            //{
-            //    //GetAccount Members
-            //    RestAPI.ProjectsAndTeams.Accounts objAccount = new RestAPI.ProjectsAndTeams.Accounts(_projectCreationVersion);
-            //    //accountMembers = objAccount.GetAccountMembers(accountName, AccessToken);
-            //    foreach (var member in accountMembers.value)
-            //    {
-            //        model.accountUsersForWi.Add(member.member.mailAddress);
-            //    }
-            //}
             Dictionary<string, string> workItems = new Dictionary<string, string>();
 
-            if (templateVersion != "2.0")
-            {
-
-                //import work items
-                string featuresFilePath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.FeaturefromTemplate == null ? string.Empty : template.FeaturefromTemplate);
-                // Path.Combine(templatesFolder + templateUsed, template.FeaturefromTemplate == null ? string.Empty : template.FeaturefromTemplate);
-                string productBackLogPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.PBIfromTemplate == null ? string.Empty : template.PBIfromTemplate);
-                // Path.Combine(templatesFolder + templateUsed, template.PBIfromTemplate == null ? string.Empty : template.PBIfromTemplate);
-                string taskPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.TaskfromTemplate == null ? string.Empty : template.TaskfromTemplate);
-                // Path.Combine(templatesFolder + templateUsed, template.TaskfromTemplate == null ? string.Empty : template.TaskfromTemplate);
-                string testCasePath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.TestCasefromTemplate == null ? string.Empty : template.TestCasefromTemplate);
-                // Path.Combine(templatesFolder + templateUsed, template.TestCasefromTemplate == null ? string.Empty : template.TestCasefromTemplate);
-                string bugPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.BugfromTemplate == null ? string.Empty : template.BugfromTemplate);
-                // Path.Combine(templatesFolder + templateUsed, template.BugfromTemplate == null ? string.Empty : template.BugfromTemplate);
-                string epicPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.EpicfromTemplate == null ? string.Empty : template.EpicfromTemplate);
-                // Path.Combine(templatesFolder + templateUsed, template.EpicfromTemplate == null ? string.Empty : template.EpicfromTemplate);
-                string userStoriesPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.UserStoriesFromTemplate == null ? string.Empty : template.UserStoriesFromTemplate);
-                // Path.Combine(templatesFolder + templateUsed, template.UserStoriesFromTemplate == null ? string.Empty : template.UserStoriesFromTemplate);
-                string testPlansPath = string.Empty;
-                string testSuitesPath = string.Empty;
-                if (templateUsed.ToLower() == "myshuttle2")
-                {
-                    testPlansPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.TestPlanfromTemplate);
-                    // Path.Combine(templatesFolder + templateUsed, template.TestPlanfromTemplate);
-                    testSuitesPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.TestSuitefromTemplate);
-                    // Path.Combine(templatesFolder + templateUsed, template.TestSuitefromTemplate);
-                }
-
-                if (templateUsed.ToLower() == "myshuttle")
-                {
-                    testPlansPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.TestPlanfromTemplate);
-                    // Path.Combine(templatesFolder + templateUsed, template.TestPlanfromTemplate);
-                    testSuitesPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, template.TestSuitefromTemplate);
-                    // Path.Combine(templatesFolder + templateUsed, template.TestSuitefromTemplate);
-                }
-
-                if (File.Exists(featuresFilePath))
-                {
-                    workItems.Add("Feature", model.ReadJsonFile(featuresFilePath));
-                }
-
-                if (File.Exists(productBackLogPath))
-                {
-                    workItems.Add("Product Backlog Item", model.ReadJsonFile(productBackLogPath));
-                }
-
-                if (File.Exists(taskPath))
-                {
-                    workItems.Add("Task", model.ReadJsonFile(taskPath));
-                }
-
-                if (File.Exists(testCasePath))
-                {
-                    workItems.Add("Test Case", model.ReadJsonFile(testCasePath));
-                }
-
-                if (File.Exists(bugPath))
-                {
-                    workItems.Add("Bug", model.ReadJsonFile(bugPath));
-                }
-
-                if (File.Exists(userStoriesPath))
-                {
-                    workItems.Add("User Story", model.ReadJsonFile(userStoriesPath));
-                }
-
-                if (File.Exists(epicPath))
-                {
-                    workItems.Add("Epic", model.ReadJsonFile(epicPath));
-                }
-
-                if (File.Exists(testPlansPath))
-                {
-                    workItems.Add("Test Plan", model.ReadJsonFile(testPlansPath));
-                }
-
-                if (File.Exists(testSuitesPath))
-                {
-                    workItems.Add("Test Suite", model.ReadJsonFile(testSuitesPath));
-                }
-            }
-            //// Modified Work Item import logic
-            else
             {
                 string _WitPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "WorkItems");
                 //Path.Combine(templatesFolder + templateUsed + "\\WorkItems");
@@ -1852,6 +1624,10 @@ namespace ADOGenerator.Services
 
                     Repository objRepositorySourceCode = new Repository(_retSourceCodeVersion);
                     bool copySourceCode = objRepositorySourceCode.GetSourceCodeFromGitHub(jsonSourceCode, model.ProjectName, repositoryDetail[0]);
+                    if (copySourceCode)
+                    {
+                        model.id.AddMessage($"Source code imported to {repositoryName} repository");
+                    }
                     if (!model.Environment.ReposImported.ContainsKey(repositoryDetail[0]))
                     {
                         model.Environment.ReposImported.Add(repositoryDetail[0], copySourceCode);
