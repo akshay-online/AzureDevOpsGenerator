@@ -147,7 +147,7 @@ namespace ADOGenerator.Services
         public string[] CreateProjectEnvironment(Project model)
         {
             string pat = model.accessToken;
-            string templateUsed = model.selectedTemplateFolder;
+            templateUsed = model.selectedTemplateFolder;
             string accountName = model.accountName;
             //define versions to be use
             string projectCreationVersion = _configuration["AppSettings:ProjectCreationVersion"] ?? string.Empty;
