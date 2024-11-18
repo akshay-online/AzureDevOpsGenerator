@@ -3,6 +3,7 @@ using ADOGenerator.Models;
 using ADOGenerator.Services;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 var configuration = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
@@ -12,7 +13,7 @@ var configuration = new ConfigurationBuilder()
 Console.WriteLine("Welcome to Azure DevOps Demo Generator! This tool will help you generate a demo environment for Azure DevOps.");
 
 string id = Guid.NewGuid().ToString().Split('-')[0];
-while (true)
+do
 {
 
     id.AddMessage("Template Datails");
@@ -52,7 +53,7 @@ while (true)
 
     id.AddMessage("Enter the template name from the list of templates above:");
     var selectedTemplateName = Console.ReadLine();
-
+    selectedTemplateName = selectedTemplateName.Trim();
     if (!TryGetTemplateDetails(groupwiseTemplates, selectedTemplateName, out var templateFolder, out var confirmedExtension))
     {
         id.AddMessage($"Template '{selectedTemplateName}' not found in the list.");
@@ -72,8 +73,25 @@ while (true)
     id.AddMessage("Enter your Azure DevOps personal access token:");
     var patToken = ReadSecret();
 
-    id.AddMessage("Enter the new project name:");
-    var projectName = Console.ReadLine();
+    string projectName = "";
+    do
+    {
+        id.AddMessage("Enter the new project name:");
+        projectName = Console.ReadLine();
+        if (!CheckProjectName(projectName))
+        {
+            id.ErrorId().AddMessage("Validation error: Project name is not valid.");
+            id.AddMessage("Do you want to try with a valid project name or exit? (type 'retry' to try again or 'exit' to quit):");
+            var userChoice = Console.ReadLine();
+            if (userChoice?.Equals("exit", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                id.AddMessage("Exiting the application.");
+                Environment.Exit(1);
+            }
+            projectName = "";
+            continue;
+        }
+    } while (string.IsNullOrWhiteSpace(projectName));
 
     if (string.IsNullOrWhiteSpace(organizationName) || string.IsNullOrWhiteSpace(patToken) || string.IsNullOrWhiteSpace(projectName))
     {
@@ -95,7 +113,7 @@ while (true)
     };
 
     CreateProjectEnvironment(project);
-}
+} while (true);
 
 bool TryGetTemplateDetails(JToken groupwiseTemplates, string selectedTemplateName, out string templateFolder, out bool confirmedExtension)
 {
@@ -242,4 +260,41 @@ void PrintErrorMessage(string message)
     Console.ForegroundColor = ConsoleColor.Red;
     Console.WriteLine($"Error: {message}");
     Console.ResetColor();
+}
+
+bool CheckProjectName(string name)
+{
+    try
+    {
+        List<string> reservedNames = new List<string>
+            {
+                "AUX", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10",
+                "CON", "DefaultCollection", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+                "NUL", "PRN", "SERVER", "SignalR", "Web", "WEB",
+                "App_Browsers", "App_code", "App_Data", "App_GlobalResources", "App_LocalResources", "App_Themes", "App_WebResources", "bin", "web.config"
+            };
+
+        if (name.Length > 64)
+        {
+            return false;
+        }
+        if (reservedNames.Contains(name))
+        {
+            return false;
+        }
+        if (Regex.IsMatch(name, @"^_|^\.") || Regex.IsMatch(name, @"\.$"))
+        {
+            return false;
+        }
+        if (Regex.IsMatch(name, @"[\x00-\x1F\x7F-\x9F\uD800-\uDFFF\\/:*?""<>;#$*{},+=\[\]|.@%&~`]"))
+        {
+            return false;
+        }
+        return true;
+    }
+    catch (Exception ex)
+    {
+        PrintErrorMessage(ex.Message);
+        return false;
+    }
 }

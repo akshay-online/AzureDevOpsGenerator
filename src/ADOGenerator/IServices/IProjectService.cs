@@ -5,10 +5,6 @@ namespace ADOGenerator.IServices
 {
     public interface IProjectService
     {
-        void RemoveKey(string id);
-
-        JObject GetStatusMessage(string id);
-
         HttpResponseMessage GetprojectList(string accname, string pat);
 
         string GetJsonFilePath(bool IsPrivate, string TemplateFolder, string TemplateName, string FileName = "");
