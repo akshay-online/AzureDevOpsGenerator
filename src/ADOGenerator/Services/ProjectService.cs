@@ -53,55 +53,6 @@ namespace ADOGenerator.Services
             _configuration = configuration;
         }
 
-        public static Dictionary<string, string> StatusMessages
-        {
-            get
-            {
-                if (statusMessages == null)
-                {
-                    statusMessages = new Dictionary<string, string>();
-                }
-
-                return statusMessages;
-            }
-            set
-            {
-                statusMessages = value;
-            }
-        }
-        public void RemoveKey(string id)
-        {
-            lock (objLock)
-            {
-                StatusMessages.Remove(id);
-            }
-        }
-        public JObject GetStatusMessage(string id)
-        {
-            lock (ProjectService.objLock)
-            {
-                string message = string.Empty;
-                JObject obj = new JObject();
-                if (id.EndsWith("_Errors"))
-                {
-                    //RemoveKey(id);
-                    obj["status"] = "Error: \t" + ProjectService.StatusMessages[id];
-                }
-                if (ProjectService.StatusMessages.Keys.Count(x => x == id) == 1)
-                {
-                    obj["status"] = ProjectService.StatusMessages[id];
-                }
-                else
-                {
-                    obj["status"] = "Successfully Created";
-
-                }
-                return obj;
-            }
-        }
-
-
-
         public HttpResponseMessage GetprojectList(string accname, string pat)
         {
             string defaultHost = _configuration["AppSettings:DefaultHost"];
@@ -150,27 +101,28 @@ namespace ADOGenerator.Services
             templateUsed = model.selectedTemplateFolder;
             string accountName = model.accountName;
             //define versions to be use
-            string projectCreationVersion = _configuration["AppSettings:ProjectCreationVersion"] ?? string.Empty;
-            string repoVersion = _configuration["AppSettings:RepoVersion"] ?? string.Empty;
-            string buildVersion = _configuration["AppSettings:BuildVersion"] ?? string.Empty;
-            string releaseVersion = _configuration["AppSettings:ReleaseVersion"] ?? string.Empty;
-            string wikiVersion = _configuration["AppSettings:WikiVersion"] ?? string.Empty;
-            string boardVersion = _configuration["AppSettings:BoardVersion"] ?? string.Empty;
-            string workItemsVersion = _configuration["AppSettings:WorkItemsVersion"] ?? string.Empty;
-            string queriesVersion = _configuration["AppSettings:QueriesVersion"] ?? string.Empty;
-            string endPointVersion = _configuration["AppSettings:EndPointVersion"] ?? string.Empty;
-            string extensionVersion = _configuration["AppSettings:ExtensionVersion"] ?? string.Empty;
-            string dashboardVersion = _configuration["AppSettings:DashboardVersion"] ?? string.Empty;
-            string agentQueueVersion = _configuration["AppSettings:AgentQueueVersion"] ?? string.Empty;
-            string getSourceCodeVersion = _configuration["AppSettings:GetSourceCodeVersion"] ?? string.Empty;
-            string testPlanVersion = _configuration["AppSettings:TestPlanVersion"] ?? string.Empty;
-            string releaseHost = _configuration["AppSettings:ReleaseHost"] ?? string.Empty;
-            string defaultHost = _configuration["AppSettings:DefaultHost"] ?? string.Empty;
-            string deploymentGroup = _configuration["AppSettings:DeloymentGroup"] ?? string.Empty;
-            string graphApiVersion = _configuration["AppSettings:GraphApiVersion"] ?? string.Empty;
-            string graphAPIHost = _configuration["AppSettings:GraphAPIHost"] ?? string.Empty;
-            string gitHubBaseAddress = _configuration["AppSettings:GitHubBaseAddress"] ?? string.Empty;
-            string variableGroupsApiVersion = _configuration["AppSettings:VariableGroupsApiVersion"] ?? string.Empty;
+            var appSettings = _configuration.GetSection("AppSettings");
+            string projectCreationVersion = appSettings["ProjectCreationVersion"] ?? string.Empty;
+            string repoVersion = appSettings["RepoVersion"] ?? string.Empty;
+            string buildVersion = appSettings["BuildVersion"] ?? string.Empty;
+            string releaseVersion = appSettings["ReleaseVersion"] ?? string.Empty;
+            string wikiVersion = appSettings["WikiVersion"] ?? string.Empty;
+            string boardVersion = appSettings["BoardVersion"] ?? string.Empty;
+            string workItemsVersion = appSettings["WorkItemsVersion"] ?? string.Empty;
+            string queriesVersion = appSettings["QueriesVersion"] ?? string.Empty;
+            string endPointVersion = appSettings["EndPointVersion"] ?? string.Empty;
+            string extensionVersion = appSettings["ExtensionVersion"] ?? string.Empty;
+            string dashboardVersion = appSettings["DashboardVersion"] ?? string.Empty;
+            string agentQueueVersion = appSettings["AgentQueueVersion"] ?? string.Empty;
+            string getSourceCodeVersion = appSettings["GetSourceCodeVersion"] ?? string.Empty;
+            string testPlanVersion = appSettings["TestPlanVersion"] ?? string.Empty;
+            string releaseHost = appSettings["ReleaseHost"] ?? string.Empty;
+            string defaultHost = appSettings["DefaultHost"] ?? string.Empty;
+            string deploymentGroup = appSettings["DeloymentGroup"] ?? string.Empty;
+            string graphApiVersion = appSettings["GraphApiVersion"] ?? string.Empty;
+            string graphAPIHost = appSettings["GraphAPIHost"] ?? string.Empty;
+            string gitHubBaseAddress = appSettings["GitHubBaseAddress"] ?? string.Empty;
+            string variableGroupsApiVersion = appSettings["VariableGroupsApiVersion"] ?? string.Empty;
 
             string processTemplateId = Default.SCRUM;
             model.Environment = new EnvironmentValues
@@ -178,9 +130,9 @@ namespace ADOGenerator.Services
                 serviceEndpoints = new(),
                 repositoryIdList = new(),
                 pullRequests = new(),
-                GitHubRepos = new(),
-                VariableGroups = new(),
-                ReposImported = new()
+                gitHubRepos = new(),
+                variableGroups = new(),
+                reposImported = new()
             };
             ProjectTemplate template = null;
             ProjectSettings settings = null;
@@ -190,17 +142,16 @@ namespace ADOGenerator.Services
             websiteUrl = model.websiteUrl;
             projectName = model.ProjectName;
 
-            string logWIT = _configuration["AppSettings:LogWIT"];
-            if (logWIT == "true")
+            if (appSettings["AppSettings:LogWIT"] == "true")
             {
-                string patBase64 = _configuration["AppSettings:PATBase64"];
-                string url = _configuration["AppSettings:URL"];
-                string projectId = _configuration["AppSettings:PROJECTID"];
-                string reportName = string.Format("{0}", "AzureDevOps_Analytics-DemoGenerator");
-                IssueWI objIssue = new IssueWI();
+                string patBase64 = appSettings["PATBase64"];
+                string url = appSettings["URL"];
+                string projectId = appSettings["PROJECTID"];
+                string reportName = "AzureDevOps_Analytics-DemoGenerator";
+                var objIssue = new IssueWI();
                 objIssue.CreateReportWI(patBase64, "4.1", url, websiteUrl, reportName, "", templateUsed, projectId, model.Region);
             }
-
+            
             ADOConfiguration _gitHubConfig = new ADOConfiguration() { _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken, _mediaType = "application/json", _scheme = "Bearer" };
 
             if (model.GitHubFork && model.GitHubToken != null)
@@ -217,39 +168,40 @@ namespace ADOGenerator.Services
             }
             //configuration setup
             string _credentials = model.accessToken;
-            ADOConfiguration _projectCreationVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = projectCreationVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _releaseVersion = new ADOConfiguration() { UriString = releaseHost + accountName + "/", VersionNumber = releaseVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _buildVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = buildVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
-            ADOConfiguration _workItemsVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = workItemsVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _queriesVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = queriesVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _boardVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = boardVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _wikiVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = wikiVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _endPointVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = endPointVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
-            ADOConfiguration _extensionVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = extensionVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _dashboardVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = dashboardVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _repoVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = repoVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
+            string baseUri = defaultHost + accountName + "/";
+            string releaseUri = releaseHost + accountName + "/";
+            string graphUri = graphAPIHost + accountName + "/";
 
-            ADOConfiguration _getSourceCodeVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = getSourceCodeVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
-            ADOConfiguration _agentQueueVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = agentQueueVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _testPlanVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = testPlanVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _deploymentGroup = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = deploymentGroup, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _graphApiVersion = new ADOConfiguration() { UriString = graphAPIHost + accountName + "/", VersionNumber = graphApiVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
-            ADOConfiguration _variableGroupApiVersion = new ADOConfiguration() { UriString = defaultHost + accountName + "/", VersionNumber = variableGroupsApiVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _projectCreationVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = projectCreationVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _releaseVersion = new ADOConfiguration() { UriString = releaseUri, VersionNumber = releaseVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _buildVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = buildVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
+            ADOConfiguration _workItemsVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = workItemsVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _queriesVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = queriesVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _boardVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = boardVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _wikiVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = wikiVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _endPointVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = endPointVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
+            ADOConfiguration _extensionVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = extensionVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _dashboardVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = dashboardVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _repoVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = repoVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
+            ADOConfiguration _getSourceCodeVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = getSourceCodeVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName, _gitbaseAddress = gitHubBaseAddress, _gitcredential = model.GitHubToken };
+            ADOConfiguration _agentQueueVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = agentQueueVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _testPlanVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = testPlanVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _deploymentGroup = new ADOConfiguration() { UriString = baseUri, VersionNumber = deploymentGroup, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _graphApiVersion = new ADOConfiguration() { UriString = graphUri, VersionNumber = graphApiVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
+            ADOConfiguration _variableGroupApiVersion = new ADOConfiguration() { UriString = baseUri, VersionNumber = variableGroupsApiVersion, PersonalAccessToken = pat, Project = model.ProjectName, AccountName = accountName };
 
             string projTemplateFile = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "ProjectTemplate.json");
-            string projectSettingsFile = string.Empty;
-            string _checkIsPrivate = string.Empty;
-            ProjectSetting setting = new ProjectSetting();
+            ProjectSetting setting = null;
             if (File.Exists(projTemplateFile))
             {
-                _checkIsPrivate = File.ReadAllText(projTemplateFile);
+                string _checkIsPrivate = File.ReadAllText(projTemplateFile);
+                if (_checkIsPrivate != "")
+                {
+                    setting = JsonConvert.DeserializeObject<ProjectSetting>(_checkIsPrivate);
+                }
             }
-            if (_checkIsPrivate != "")
-            {
-                setting = JsonConvert.DeserializeObject<ProjectSetting>(_checkIsPrivate);
-            }
-
             //initialize project template and settings
+            string projectSettingsFile = string.Empty;
             try
             {
                 if (File.Exists(projTemplateFile))
@@ -287,7 +239,6 @@ namespace ADOGenerator.Services
                             else
                             {
                                 model.id.ErrorId().AddMessage("Could not recognize process template. Make sure that the exported project template is belog to standard process template or project setting file has valid process template id.");
-                                StatusMessages[model.id] = "100";
                                 return new string[] { model.id, accountName, templateUsed };
                             }
                         }
@@ -308,7 +259,6 @@ namespace ADOGenerator.Services
             catch (Exception ex)
             {
                 Console.WriteLine("Error in reading project template file:" + ex.Message);
-                // // logger.Info(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "\t" + "\t" + ex.Message + "\t" + "\n" + ex.StackTrace + "\n");
             }
             //create team project
             string jsonProject = model.ReadJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "Templates", "CreateProject.json"));
@@ -369,14 +319,6 @@ namespace ADOGenerator.Services
                 ForkGitHubRepository(model, _gitHubConfig);
             }
 
-            //Add user as project admin
-            //bool isAdded = AddUserToProject(_graphApiVersion, model);
-            //if (isAdded)
-            //{
-            //    Console.WriteLine(string.Format("Added user {0} as project admin ", model.Email));
-            //    model.id.AddMessage( string.Format("Added user {0} as project admin ", model.Email));
-            //}
-
             //Install required extensions
             if (!model.IsApi && model.isExtensionNeeded && model.isAgreeTerms)
             {
@@ -411,8 +353,9 @@ namespace ADOGenerator.Services
                 JObject jObject = JsonConvert.DeserializeObject<JObject>(projectTemplate);
                 templateVersion = jObject["TemplateVersion"] == null ? string.Empty : jObject["TemplateVersion"].ToString();
             }
-            {
-                UpdateIterations(model, _boardVersion, "Iterations.json");
+
+            #region setup teams and iterations
+            UpdateIterations(model, _boardVersion, "Iterations.json");
                 // for newer version of templates
                 string teamsJsonPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "Teams\\Teams.json");
                 if (File.Exists(teamsJsonPath))
@@ -523,9 +466,10 @@ namespace ADOGenerator.Services
 
                     RenameIterations(model, _boardVersion, settings.renameIterations);
                 }
-            }
+            #endregion
 
-            //create service endpoint
+
+            #region create service endpoint
             List<string> listEndPointsJsonPath = new List<string>();
             string serviceEndPointsPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "ServiceEndpoints");
             if (Directory.Exists(serviceEndPointsPath))
@@ -553,7 +497,10 @@ namespace ADOGenerator.Services
                 }
             }
 
-            //import source code from GitHub
+            #endregion
+
+         
+            #region import source code
             List<string> listImportSourceCodeJsonPaths = new List<string>();
             string importSourceCodePath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "ImportSourceCode");
             //templatesFolder + templateUsed + @"\ImportSourceCode";
@@ -577,12 +524,12 @@ namespace ADOGenerator.Services
                 bool isDeleted = objRepository.DeleteRepository(repositoryToDelete);
             }
 
+            #endregion
+
             //Create Pull request
             Thread.Sleep(10000); //Adding delay to wait for the repository to create and import from the source
 
-            //Create WIKI
-            //CreateProjetWiki(Path.Combine(Directory.GetCurrentDirectory(), "Templates"), model, _wikiVersion);
-            //CreateCodeWiki(model, _wikiVersion);
+            #region pull request
 
             List<string> listPullRequestJsonPaths = new List<string>();
             string pullRequestFolder = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "PullRequests");
@@ -596,30 +543,31 @@ namespace ADOGenerator.Services
                 CreatePullRequest(model, pullReq, _workItemsVersion);
             }
 
-            Dictionary<string, string> workItems = new Dictionary<string, string>();
+            #endregion
 
+
+            #region work items
+            Dictionary<string, string> workItems = new();
+            string _WitPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "WorkItems");
+            //Path.Combine(templatesFolder + templateUsed + "\\WorkItems");
+            if (Directory.Exists(_WitPath))
             {
-                string _WitPath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "WorkItems");
-                //Path.Combine(templatesFolder + templateUsed + "\\WorkItems");
-                if (Directory.Exists(_WitPath))
+                string[] workItemFilePaths = Directory.GetFiles(_WitPath);
+                if (workItemFilePaths.Length > 0)
                 {
-                    string[] workItemFilePaths = Directory.GetFiles(_WitPath);
-                    if (workItemFilePaths.Length > 0)
+                    foreach (var workItem in workItemFilePaths)
                     {
-                        foreach (var workItem in workItemFilePaths)
+                        string[] workItemPatSplit = workItem.Split('\\');
+                        if (workItemPatSplit.Length > 0)
                         {
-                            string[] workItemPatSplit = workItem.Split('\\');
-                            if (workItemPatSplit.Length > 0)
+                            string workItemName = workItemPatSplit[workItemPatSplit.Length - 1];
+                            if (!string.IsNullOrEmpty(workItemName))
                             {
-                                string workItemName = workItemPatSplit[workItemPatSplit.Length - 1];
-                                if (!string.IsNullOrEmpty(workItemName))
+                                string[] nameExtension = workItemName.Split('.');
+                                string name = nameExtension[0];
+                                if (!workItems.ContainsKey(name))
                                 {
-                                    string[] nameExtension = workItemName.Split('.');
-                                    string name = nameExtension[0];
-                                    if (!workItems.ContainsKey(name))
-                                    {
-                                        workItems.Add(name, model.ReadJsonFile(workItem));
-                                    }
+                                    workItems.Add(name, model.ReadJsonFile(workItem));
                                 }
                             }
                         }
@@ -653,6 +601,9 @@ namespace ADOGenerator.Services
                 }
                 model.id.AddMessage("Work Items created");
             }
+
+            #endregion
+
             //Creat TestPlans and TestSuites
             List<string> listTestPlansJsonPaths = new List<string>();
             string testPlansFolder = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, templateUsed, "TestPlans");
@@ -886,9 +837,9 @@ namespace ADOGenerator.Services
                                     dynamic fr = JsonConvert.DeserializeObject<dynamic>(forkedRepo);
                                     model.GitRepoName = fr.name;
                                     model.GitRepoURL = fr.html_url;
-                                    if (!model.Environment.GitHubRepos.ContainsKey(model.GitRepoName))
+                                    if (!model.Environment.gitHubRepos.ContainsKey(model.GitRepoName))
                                     {
-                                        model.Environment.GitHubRepos.Add(model.GitRepoName, model.GitRepoURL);
+                                        model.Environment.gitHubRepos.Add(model.GitRepoName, model.GitRepoURL);
                                     }
                                     model.id.AddMessage(string.Format("Forked {0} repository to {1} user", model.GitRepoName, _gitHubConfig.userName));
                                 }
@@ -1628,9 +1579,9 @@ namespace ADOGenerator.Services
                     {
                         model.id.AddMessage($"Source code imported to {repositoryName} repository");
                     }
-                    if (!model.Environment.ReposImported.ContainsKey(repositoryDetail[0]))
+                    if (!model.Environment.reposImported.ContainsKey(repositoryDetail[0]))
                     {
-                        model.Environment.ReposImported.Add(repositoryDetail[0], copySourceCode);
+                        model.Environment.reposImported.Add(repositoryDetail[0], copySourceCode);
                     }
 
                     if (!(string.IsNullOrEmpty(objRepository.LastFailureMessage)))
@@ -1753,19 +1704,19 @@ namespace ADOGenerator.Services
                             string url = jsonToCreate["url"].ToString();
                             string repoNameInUrl = Path.GetFileName(url);
                             // Endpoint type is Git(External Git), so we should point Build def to his repo by creating endpoint of Type GitHub(Public)
-                            foreach (var repo in model.Environment.GitHubRepos.Keys)
+                            foreach (var repo in model.Environment.gitHubRepos.Keys)
                             {
                                 if (repoNameInUrl.Contains(repo))
                                 {
                                     if (type.ToLower() == "git")
                                     {
                                         jsonToCreate["type"] = "GitHub"; //Changing endpoint type
-                                        jsonToCreate["url"] = model.Environment.GitHubRepos[repo].ToString(); // updating endpoint URL with User forked repo URL
+                                        jsonToCreate["url"] = model.Environment.gitHubRepos[repo].ToString(); // updating endpoint URL with User forked repo URL
                                     }
                                     // Endpoint type is GitHub(Public), so we should point the build def to his repo by updating the URL
                                     else if (type.ToLower() == "github")
                                     {
-                                        jsonToCreate["url"] = model.Environment.GitHubRepos[repo].ToString(); // Updating repo URL to user repo
+                                        jsonToCreate["url"] = model.Environment.gitHubRepos[repo].ToString(); // Updating repo URL to user repo
                                     }
                                     else
                                     {
@@ -1929,9 +1880,9 @@ namespace ADOGenerator.Services
                                              .Replace("$username$", model.GitHubUserName)
                                              .Replace("$Organization$", model.accountName);
 
-                        if (model.Environment.VariableGroups.Count > 0)
+                        if (model.Environment.variableGroups.Count > 0)
                         {
-                            foreach (var vGroupsId in model.Environment.VariableGroups)
+                            foreach (var vGroupsId in model.Environment.variableGroups)
                             {
                                 string placeHolder = string.Format("${0}$", vGroupsId.Value);
                                 jsonBuildDefinition = jsonBuildDefinition.Replace(placeHolder, vGroupsId.Key.ToString());
@@ -2044,9 +1995,9 @@ namespace ADOGenerator.Services
                                              .Replace("$OwnerId$", teamMember.identity.id)
                                   .Replace("$OwnerDisplayName$", teamMember.identity.displayName);
 
-                        if (model.Environment.VariableGroups.Count > 0)
+                        if (model.Environment.variableGroups.Count > 0)
                         {
-                            foreach (var vGroupsId in model.Environment.VariableGroups)
+                            foreach (var vGroupsId in model.Environment.variableGroups)
                             {
                                 string placeHolder = string.Format("${0}$", vGroupsId.Value);
                                 jsonReleaseDefinition = jsonReleaseDefinition.Replace(placeHolder, vGroupsId.Key.ToString());
@@ -2612,9 +2563,9 @@ namespace ADOGenerator.Services
                             {
                                 if (model.Environment.repositoryIdList.ContainsKey(repository) && !string.IsNullOrEmpty(model.Environment.repositoryIdList[repository]))
                                 {
-                                    if (model.Environment.ReposImported.ContainsKey(model.Environment.repositoryIdList[repository]))
+                                    if (model.Environment.reposImported.ContainsKey(model.Environment.repositoryIdList[repository]))
                                     {
-                                        isImported = model.Environment.ReposImported[model.Environment.repositoryIdList[repository]];
+                                        isImported = model.Environment.reposImported[model.Environment.repositoryIdList[repository]];
                                     }
 
                                     string placeHolder = string.Format("${0}$", repository);
@@ -2745,7 +2696,7 @@ namespace ADOGenerator.Services
         void CreateVaribaleGroups(Project model, ADOConfiguration _variableGroups)
         {
             VariableGroups variableGroups = new VariableGroups(_variableGroups);
-            model.Environment.VariableGroups = new Dictionary<int, string>();
+            model.Environment.variableGroups = new Dictionary<int, string>();
             string filePath = GetJsonFilePath(model.IsPrivatePath, model.PrivateTemplatePath, model.SelectedTemplate, "VariableGroups\\VariableGroup.json");
             if (File.Exists(filePath))
             {
@@ -2758,7 +2709,7 @@ namespace ADOGenerator.Services
                         GetVariableGroups.VariableGroupsCreateResponse response = variableGroups.PostVariableGroups(JsonConvert.SerializeObject(group));
                         if (!string.IsNullOrEmpty(response.name))
                         {
-                            model.Environment.VariableGroups.Add(response.id, response.name);
+                            model.Environment.variableGroups.Add(response.id, response.name);
                         }
                     }
                 }
