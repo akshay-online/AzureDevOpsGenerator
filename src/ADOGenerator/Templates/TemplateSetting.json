@@ -29,7 +29,7 @@
         {
           "Key": "773866",
           "Name": "Tailwind Traders",
-          "TemplateFolder": "Gen-TailwindTradersNew",
+          "TemplateFolder": "Gen-Tailwind Traders",
           "ShortName": "TailwindTraders",
           "Description": "Tailwind Traders is an .NET Core & React application. The template has been configured to showcase the features of GHAzDo. Please refer to <a href='https://azure.microsoft.com/en-in/products/devops/github-advanced-security'> GitHub Advanced Security for Azure DevOps </a>",
           "Tags": [
@@ -51,7 +51,7 @@
         {
           "Key": "77379",
           "Name": "PartsUnlimited",
-          "TemplateFolder": "Gen-PartsUnlimited-tc",
+          "TemplateFolder": "Gen-PartsUnlimited",
           "ShortName": "PartsUnlimited",
           "Description": "Use this lab to provision a scrum based team project containing sample work items, complete source code and pipeline definitions to deploy Parts Unlimited, a sample eCommerce website based on the The Phoenix Project book by Gene Kim. See the home page of the project on <a href='https://github.com/Microsoft/PartsUnlimited' target='_blank'>GitHub</a> ",
           "Tags": [
@@ -91,7 +91,7 @@
         {
           "Key": "77384",
           "Name": "ContosoAir",
-          "TemplateFolder": "Gen-ContosoAir-tc",
+          "TemplateFolder": "Gen-ContosoAir",
           "ShortName": "ContosoAir",
           "Description": "Contoso Air is a sample airline booking application with a Node.js based frontend with a CosmosDB database. This template provisions an Agile based project with user stories, features, epics and a CI&CD pipeline that builds and deploys code from  <a href='https://github.com/Microsoft/ContosoAir' target='_blank'>GitHub</a>",
           "Tags": [
